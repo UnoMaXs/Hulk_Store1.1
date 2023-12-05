@@ -7,16 +7,15 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "usuario")
+@Table(name = "usuarios")
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long usuarioId;
     @NotEmpty
     private String nombre;
     @NotEmpty
-    @Email
     private String correo;
     @NotEmpty
     private String contrasena;

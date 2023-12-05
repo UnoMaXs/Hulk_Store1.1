@@ -1,21 +1,32 @@
 package com.example.hulkstore.Controller;
 
+import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Entity.Usuario;
-import com.example.hulkstore.Service.IUsuarioService;
+import com.example.hulkstore.Service.ProductoService;
+import com.example.hulkstore.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/")
+import java.util.List;
+
+
+@RestController
+@RequestMapping("/usuario")
 public class UsuarioController {
 
     @Autowired
-    private IUsuarioService usuarioService;
+    private UsuarioService usuarioService;
+    @Autowired
+    private ProductoService productoService;
 
-
-    public String crear(Model model) {
-        Usuario usuario = new Usuario();
+    @PostMapping("/add")
+    public void saveUsuario(@RequestBody Usuario usuario) {
+        usuarioService.addUsuario(usuario);
     }
+
+    @GetMapping("/productos")//Listar productos
+    public List<Producto> getProductos() {
+        return productoService.getProductos();
+    }
+
 }

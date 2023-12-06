@@ -1,5 +1,6 @@
 package com.example.hulkstore.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,13 +15,17 @@ public class Carrito {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carritoId;
 
-    @OneToMany
-    private List<Producto> productos;
-
     private int cantidadProductos;
 
-    private Double valorTotal;
+    private Double valorTotal=0.0;
+
+    @OneToMany(mappedBy = "carrito")
+    private List<Producto> productos;
 
     @OneToOne
+    @JoinColumn(name = "usuario_id")
+    @JsonIgnore
     private Usuario usuario;
+
+
 }

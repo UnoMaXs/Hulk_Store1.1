@@ -20,4 +20,8 @@ public class Producto {
     private int cantidad;
     @NotNull
     private Long precio;
+
+    @ManyToOne
+    @JoinColumn(name="carrito_id")
+    private Carrito carrito;
 }

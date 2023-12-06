@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -20,6 +21,10 @@ public class AdminController {
     @GetMapping("/admins")//Listar admins
     public List<Admin> getAdmins() {
         return adminService.getAdmins();
+    }
+    @GetMapping("/admins/{adminId}")//Listar usuarios
+    public Optional<Admin> getAdminById(@PathVariable("adminId") Long adminId) {
+        return adminService.getAdminById(adminId);
     }
 
     @PostMapping("/addAdmin")//Agregar admin
@@ -36,23 +41,6 @@ public class AdminController {
     public void updateAdmin(@PathVariable("adminId") Long adminId, @RequestBody Admin admin) {
         admin.setAdminId(adminId);
         adminService.updateAdmin(admin);
-    }
-
-    //USUARIOS
-    @GetMapping("/usuarios")//Listar usuarios
-    public List<Usuario> getUsuarios() {
-        return adminService.getUsuarios();
-    }
-
-    @PutMapping("/updateUsuario/{usuarioId}")//Actualizar usuario
-    public void updateUsuario(@PathVariable("usuarioId") Long usuarioId, @RequestBody Usuario usuario) {
-        usuario.setUsuarioId(usuarioId);
-        adminService.updateUsuario(usuario);
-    }
-
-    @DeleteMapping("/deleteUsuario/{usuarioId}")//Borrar usuario
-    public void deleteUsuarioById(@PathVariable("usuarioId") Long usuarioId) {
-        adminService.deleteUsuarioById(usuarioId);
     }
 
 }

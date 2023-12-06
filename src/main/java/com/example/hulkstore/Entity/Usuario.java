@@ -1,7 +1,6 @@
 package com.example.hulkstore.Entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
@@ -19,5 +18,8 @@ public class Usuario {
     private String correo;
     @NotEmpty
     private String contrasena;
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private Carrito carrito;
 
 }

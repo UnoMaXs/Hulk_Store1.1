@@ -14,24 +14,25 @@ public class ProductoController {
     @Autowired
     ProductoService productoService;
 
-    @GetMapping("/productos")//Listar productos
+    @GetMapping("/productos") // Listar productos
     public List<Producto> getProductos() {
-        return productoService.getProductos();
+        return productoService.obtenerProductos();
     }
 
-    @PostMapping//Agregar producto
-    public void addProduct(@RequestBody Producto producto) {
+    @PostMapping("/addProducto") // Agregar producto
+    public void addProducto(@RequestBody Producto producto) {
         productoService.agregarProducto(producto);
     }
 
-    @PutMapping("/updateProducto/{productoId}")//Actualizar producto
-    public void updateProducto(@PathVariable("productoId")Long productoId,@RequestBody Producto producto) {
+    @PutMapping("/updateProducto/{productoId}") // Actualizar producto
+    public void updateProducto(@PathVariable("productoId") Long productoId, @RequestBody Producto producto) {
         producto.setProductoId(productoId);
         productoService.actualizarProducto(producto);
     }
 
-    @DeleteMapping("/deleteProducto/{productoId}")//Borrar producto
-    public void deleteProducto(@PathVariable Producto productoId) {
+    @DeleteMapping("/deleteProducto/{productoId}") // Borrar producto
+    public void deleteProducto(@PathVariable Long productoId) {
         productoService.borrarProducto(productoId);
     }
 }
+

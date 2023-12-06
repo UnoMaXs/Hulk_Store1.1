@@ -2,12 +2,13 @@ package com.example.hulkstore.Service;
 
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Producto;
-import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Repository.CarritoRepository;
-import com.example.hulkstore.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,24 +18,19 @@ public class CarritoService {
     private CarritoRepository carritoRepository;
     @Autowired
     private ProductoService productoService;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
-    public void agregarProductoCarrito(Long carritoId, Long productoId){
+    public List<Carrito> verCarrito(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
         if (optionalCarrito.isPresent()) {
-            Carrito carrito = optionalCarrito.get();
-            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
-
-            if (optionalProducto.isPresent()) {
-                Producto producto = optionalProducto.get();
-                carrito.getProductos().add(producto);
-                totalCarrito(carrito);
-            } else {
-                System.out.println("El producto con ID " + productoId + " no se encuentra");
-            }
+            List<Carrito> listaCarrito = new ArrayList<>();
+            listaCarrito.add(optionalCarrito.get());
+            return listaCarrito;
+        } else {
+            System.out.println("Carrito no encontrado");
+            return new ArrayList<>();
         }
     }
+
 
    public void eliminarProductoCarrito(Long carritoId, Long productoId){
        Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
@@ -56,18 +52,21 @@ public class CarritoService {
        carritoRepository.save(carrito);
     }
 
-    public void asociarCarritoAUsuario(Long carritoId, Long usuarioId) {
+    public void agregarProductoCarrito(Long carritoId, Long productoId){
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
-        Optional<Usuario> optionalUsuario = usuarioRepository.findById(usuarioId);
-
-        if (optionalCarrito.isPresent() && optionalUsuario.isPresent()) {
+        if (optionalCarrito.isPresent()) {
             Carrito carrito = optionalCarrito.get();
-            Usuario usuario = optionalUsuario.get();
+            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
 
-            carrito.setUsuario(usuario);
-            carritoRepository.save(carrito);
-        } else {
-            System.out.println("No se encontró el carrito o el usuario");
+            if (optionalProducto.isPresent()) {
+                Producto producto = optionalProducto.get();
+                carrito.getProductos().add(producto);
+                totalCarrito(carrito);
+            } else {
+                System.out.println("El producto con ID " + productoId + " no se encuentra");
+            }
         }
     }
+
+
 }

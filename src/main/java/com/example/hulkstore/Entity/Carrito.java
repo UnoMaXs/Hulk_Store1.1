@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,17 +16,17 @@ public class Carrito {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carritoId;
 
-    private int cantidadProductos;
+    private int cantidadProductos=0;
 
     private Double valorTotal=0.0;
 
     @OneToMany(mappedBy = "carrito")
-    private List<Producto> productos;
+    @JsonIgnore
+    private List<Producto> productos = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "usuario_id")
     @JsonIgnore
     private Usuario usuario;
-
 
 }

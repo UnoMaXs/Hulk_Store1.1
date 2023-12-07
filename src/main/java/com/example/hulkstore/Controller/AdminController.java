@@ -22,7 +22,7 @@ public class AdminController {
     public List<Admin> getAdmins() {
         return adminService.getAdmins();
     }
-    @GetMapping("/admins/{adminId}")//Listar usuarios
+    @GetMapping("/verAdmins/{adminId}")//Listar usuarios
     public Optional<Admin> getAdminById(@PathVariable("adminId") Long adminId) {
         return adminService.getAdminById(adminId);
     }

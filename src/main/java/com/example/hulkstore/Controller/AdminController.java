@@ -1,5 +1,6 @@
 package com.example.hulkstore.Controller;
 
+import com.example.hulkstore.DTO.AdminDTO;
 import com.example.hulkstore.Entity.Admin;
 import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Service.AdminService;
@@ -17,30 +18,29 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
-    //ADMIN
-    @GetMapping("/admins")//Listar admins
-    public List<Admin> getAdmins() {
+    @PostMapping("/addAdmin")//Agregar admin
+    public void addAdmin(@RequestBody AdminDTO adminDTO) {
+        adminService.addAdmin(adminDTO);
+    }
+
+    @GetMapping("/verAdmins")//Listar admins
+    public List<AdminDTO> getAdmins() {
         return adminService.getAdmins();
     }
+
     @GetMapping("/verAdmins/{adminId}")//Listar usuarios
-    public Optional<Admin> getAdminById(@PathVariable("adminId") Long adminId) {
+    public Optional<AdminDTO> getAdminById(@PathVariable("adminId") Long adminId) {
         return adminService.getAdminById(adminId);
     }
 
-    @PostMapping("/addAdmin")//Agregar admin
-    public void addAdmin(@RequestBody Admin admin) {
-        adminService.addAdmin(admin);
+    @PutMapping("/updateAdmin/{adminId}")//Actualizar admin
+    public void updateAdmin(@PathVariable("adminId") Long adminId, @RequestBody AdminDTO adminDTO) {
+        adminDTO.setAdminId(adminId);
+        adminService.updateAdmin(adminDTO);
     }
 
     @DeleteMapping("/deleteAdmin/{adminId}")//Borrar admin
     public void deleteAdminById(@PathVariable("adminId") Long adminId) {
         adminService.deleteAdminById(adminId);
     }
-
-    @PutMapping("/updateAdmin/{adminId}")//Actualizar admin
-    public void updateAdmin(@PathVariable("adminId") Long adminId, @RequestBody Admin admin) {
-        admin.setAdminId(adminId);
-        adminService.updateAdmin(admin);
-    }
-
 }

@@ -3,6 +3,7 @@ package com.example.hulkstore.Service;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Repository.CarritoRepository;
+import com.example.hulkstore.Repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CarritoService {
@@ -20,11 +20,11 @@ public class CarritoService {
     @Autowired
     private ProductoService productoService;
 
-    public List<Carrito> verCarritos(){
+    public List<Carrito> verCarritos() {
         return carritoRepository.findAll();
     }
 
-    public List<Carrito> verCarrito(Long carritoId) {
+    public List<Carrito> verCarritoId(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
         if (optionalCarrito.isPresent()) {
             List<Carrito> listaCarrito = new ArrayList<>();
@@ -36,35 +36,66 @@ public class CarritoService {
         }
     }
 
-    @Transactional
-    public void agregarProductoCarrito(Long carritoId, Long productoId) {
+
+    public Carrito obtenerCarritoPorId(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
-        Carrito carrito = optionalCarrito.get();
-        Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
-        if (optionalProducto.isPresent()) {
-            Producto producto = optionalProducto.get();
-            this.agregarProducto(producto, carrito);
-            carritoRepository.save(carrito);
-            totalCarrito(carrito);
-        }
+        return optionalCarrito.orElseThrow(() -> new Excepcion("Carrito no encontrado"));
     }
 
-
-    private void totalCarrito(Carrito carrito) {
+    public void calcularTotal(Carrito carrito) {
         double valorTotal = 0.0;
         for (Producto producto : carrito.getProductos()) {
             valorTotal += producto.getPrecio();
         }
         carrito.setCantidadProductos(carrito.getProductos().size());
         carrito.setValorTotal(valorTotal);
-        carritoRepository.save(carrito);
+    }
+
+    @Transactional
+    public void agregarProducto(Long carritoId, Long productoId) {
+        Carrito carrito = obtenerCarritoPorId(carritoId);
+
+        Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
+        if (optionalProducto.isPresent()) {
+            Producto producto = optionalProducto.get();
+
+            if (producto.getCantidad() > 0) {
+                carrito.getProductos().add(producto);
+                producto.setCantidad(producto.getCantidad() - 1);
+                calcularTotal(carrito);
+                carritoRepository.save(carrito);
+                productoService.actualizarProducto(producto);
+            } else {
+                throw new Excepcion("No hay suficiente stock");
+            }
+        } else {
+            throw new Excepcion("Producto no encontrado");
+        }
     }
 
 
-    public void agregarProducto(Producto producto, Carrito carrito) {
-        List<Producto> productos = new ArrayList<>();
-        productos.add(producto);
-        producto.setCarrito(carrito);
+    @Transactional
+    public void eliminarProducto(Long carritoId, Long productoId) {
+        Carrito carrito = obtenerCarritoPorId(carritoId);
+
+        boolean productoEnCarrito = carrito.getProductos().removeIf(producto -> producto.getProductoId().equals(productoId));
+
+        if (productoEnCarrito) {
+            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
+
+            if (optionalProducto.isPresent()) {
+                Producto producto = optionalProducto.get();
+
+                producto.setCantidad(producto.getCantidad() + 1);
+                calcularTotal(carrito);
+                carritoRepository.save(carrito);
+                productoService.actualizarProducto(producto);
+            } else {
+                throw new Excepcion("Producto no encontrado");
+            }
+        }
+
     }
 
 }
+

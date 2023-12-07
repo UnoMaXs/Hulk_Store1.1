@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name="carritos")
@@ -17,7 +16,7 @@ public class Carrito {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carritoId;
 
-    private int cantidadProductos;
+    private int cantidadProductos=0;
 
     private Double valorTotal=0.0;
 
@@ -29,18 +28,5 @@ public class Carrito {
     @JoinColumn(name = "usuario_id")
     @JsonIgnore
     private Usuario usuario;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Carrito carrito = (Carrito) o;
-        return Objects.equals(carritoId, carrito.carritoId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(carritoId);
-    }
 
 }

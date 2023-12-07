@@ -32,7 +32,6 @@ public class UsuarioService{
         return usuarioRepository.findById(usuarioId);
     }
 
-
     public void updateUsuario(Usuario usuario){
         usuarioRepository.save(usuario);
     }
@@ -40,7 +39,5 @@ public class UsuarioService{
     public void deleteUsuarioById(Long id){
         usuarioRepository.deleteById(id);
     }
-
-
 
 }

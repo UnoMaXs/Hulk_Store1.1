@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name="carritos")
@@ -29,7 +30,17 @@ public class Carrito {
     @JsonIgnore
     private Usuario usuario;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Carrito carrito = (Carrito) o;
+        return Objects.equals(carritoId, carrito.carritoId);
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(carritoId);
+    }
 
 }

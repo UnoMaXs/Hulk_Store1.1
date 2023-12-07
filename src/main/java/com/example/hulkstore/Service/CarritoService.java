@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CarritoService {
@@ -18,6 +19,10 @@ public class CarritoService {
     private CarritoRepository carritoRepository;
     @Autowired
     private ProductoService productoService;
+
+    public List<Carrito> verCarritos(){
+        return carritoRepository.findAll();
+    }
 
     public List<Carrito> verCarrito(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
@@ -32,44 +37,31 @@ public class CarritoService {
     }
 
     @Transactional
-    public void agregarProductoCarrito(Long carritoId, Long productoId){
+    public void agregarProductoCarrito(Long carritoId, Long productoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
-        if (optionalCarrito.isPresent()) {
-            Carrito carrito = optionalCarrito.get();
-            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
-
-            if (optionalProducto.isPresent()) {
-                Producto producto = optionalProducto.get();
-                this.agregarProducto(producto,carrito);
-                carritoRepository.save(carrito);
-                totalCarrito(carrito);
-            }
-        } else {
-            System.out.println("El carrito con ID " + carritoId + " no se encuentra");
+        Carrito carrito = optionalCarrito.get();
+        Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
+        if (optionalProducto.isPresent()) {
+            Producto producto = optionalProducto.get();
+            this.agregarProducto(producto, carrito);
+            carritoRepository.save(carrito);
+            totalCarrito(carrito);
         }
     }
 
-   public void eliminarProductoCarrito(Long carritoId, Long productoId){
-       Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
-       if(optionalCarrito.isPresent()){
-           Carrito carrito = optionalCarrito.get();
-           carrito.getProductos().removeIf(producto -> producto.getProductoId().equals(productoId));
-           totalCarrito(carrito);
-       }
-   }
 
     private void totalCarrito(Carrito carrito) {
-       double valorTotal = 0.0;
-       for(Producto producto : carrito.getProductos()){
-           valorTotal += producto.getPrecio();
-       }
-       carrito.setCantidadProductos(carrito.getProductos().size());
-       carrito.setValorTotal(valorTotal);
-       carritoRepository.save(carrito);
+        double valorTotal = 0.0;
+        for (Producto producto : carrito.getProductos()) {
+            valorTotal += producto.getPrecio();
+        }
+        carrito.setCantidadProductos(carrito.getProductos().size());
+        carrito.setValorTotal(valorTotal);
+        carritoRepository.save(carrito);
     }
 
 
-    public void agregarProducto(Producto producto,Carrito carrito) {
+    public void agregarProducto(Producto producto, Carrito carrito) {
         List<Producto> productos = new ArrayList<>();
         productos.add(producto);
         producto.setCarrito(carrito);

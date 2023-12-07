@@ -31,6 +31,23 @@ public class CarritoService {
         }
     }
 
+    @Transactional
+    public void agregarProductoCarrito(Long carritoId, Long productoId){
+        Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
+        if (optionalCarrito.isPresent()) {
+            Carrito carrito = optionalCarrito.get();
+            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
+
+            if (optionalProducto.isPresent()) {
+                Producto producto = optionalProducto.get();
+                this.agregarProducto(producto,carrito);
+                carritoRepository.save(carrito);
+                totalCarrito(carrito);
+            }
+        } else {
+            System.out.println("El carrito con ID " + carritoId + " no se encuentra");
+        }
+    }
 
    public void eliminarProductoCarrito(Long carritoId, Long productoId){
        Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
@@ -39,7 +56,6 @@ public class CarritoService {
            carrito.getProductos().removeIf(producto -> producto.getProductoId().equals(productoId));
            totalCarrito(carrito);
        }
-
    }
 
     private void totalCarrito(Carrito carrito) {
@@ -52,21 +68,11 @@ public class CarritoService {
        carritoRepository.save(carrito);
     }
 
-    public void agregarProductoCarrito(Long carritoId, Long productoId){
-        Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
-        if (optionalCarrito.isPresent()) {
-            Carrito carrito = optionalCarrito.get();
-            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
 
-            if (optionalProducto.isPresent()) {
-                Producto producto = optionalProducto.get();
-                carrito.getProductos().add(producto);
-                totalCarrito(carrito);
-            } else {
-                System.out.println("El producto con ID " + productoId + " no se encuentra");
-            }
-        }
+    public void agregarProducto(Producto producto,Carrito carrito) {
+        List<Producto> productos = new ArrayList<>();
+        productos.add(producto);
+        producto.setCarrito(carrito);
     }
-
 
 }

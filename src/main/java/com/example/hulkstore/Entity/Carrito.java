@@ -21,7 +21,8 @@ public class Carrito {
     private Double valorTotal=0.0;
 
     @OneToMany(mappedBy = "carrito")
-    private List<Producto> productos;
+    @JsonIgnore
+    private List<Producto> productos = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "usuario_id")

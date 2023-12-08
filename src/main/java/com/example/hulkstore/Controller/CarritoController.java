@@ -1,5 +1,6 @@
 package com.example.hulkstore.Controller;
 
+import com.example.hulkstore.DTO.CarritoDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Service.CarritoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,13 @@ public class CarritoController {
     CarritoService carritoService;
 
     @GetMapping("/verCarritos")
-    public List<Carrito> verCarritos() {
-        return carritoService.verCarritos();
+    public List<CarritoDTO> verCarritos() {
+        return carritoService.getCarritos();
     }
 
     @GetMapping("/verCarrito/{carritoId}")
-    public List<Carrito> verCarrito(@PathVariable Long carritoId){
-        return carritoService.verCarritoId(carritoId);
+    public List<CarritoDTO> verCarrito(@PathVariable Long carritoId){
+        return carritoService.getCarritoId(carritoId);
     }
 
     @PostMapping("/agregarProducto/{carritoId}/{productoId}")

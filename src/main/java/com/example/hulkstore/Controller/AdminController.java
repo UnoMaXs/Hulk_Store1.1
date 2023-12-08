@@ -28,7 +28,7 @@ public class AdminController {
         return adminService.getAdmins();
     }
 
-    @GetMapping("/verAdmins/{adminId}")//Listar usuarios
+    @GetMapping("/verAdmins/{adminId}")//Llamar admin por id
     public Optional<AdminDTO> getAdminById(@PathVariable("adminId") Long adminId) {
         return adminService.getAdminById(adminId);
     }

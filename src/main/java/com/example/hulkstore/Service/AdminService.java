@@ -3,7 +3,6 @@ package com.example.hulkstore.Service;
 import com.example.hulkstore.DTO.AdminDTO;
 import com.example.hulkstore.Entity.Admin;
 import com.example.hulkstore.Repository.AdminRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +33,8 @@ public class AdminService{
         return optionalAdminDTO.map(this::convertirADTO);
     }
 
-    public void deleteAdminById(Long id){
-        adminRepository.deleteById(id);
+    public void deleteAdminById(Long adminId){
+        adminRepository.deleteById(adminId);
     }
 
     public void updateAdmin(AdminDTO adminDTO){

@@ -18,12 +18,12 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping("/addUsuario")
+    @PostMapping("/addUsuario")//Agregar usuario
     public void saveUsuario(@RequestBody UsuarioDTO usuarioDTO) {
         usuarioService.addUsuario(usuarioDTO);
     }
 
-    @GetMapping("/verUsuarios")
+    @GetMapping("/verUsuarios")//Ver usuarios
     public List<UsuarioDTO> getUsuarios() {
         return usuarioService.getUsuarios();
     }

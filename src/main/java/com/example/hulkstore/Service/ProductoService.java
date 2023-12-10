@@ -50,7 +50,7 @@ public class ProductoService {
         productoRepository.save(producto);
     }
 
-    private ProductoDTO convertirADTO(Producto producto){
+    public ProductoDTO convertirADTO(Producto producto){
         ProductoDTO productoDTO = new ProductoDTO();
         productoDTO.setProductoId(producto.getProductoId());
         productoDTO.setNombre(producto.getNombre());
@@ -59,7 +59,7 @@ public class ProductoService {
         return productoDTO;
     }
 
-    private Producto convertirAEntidad(ProductoDTO productoDTO) {
+    public Producto convertirAEntidad(ProductoDTO productoDTO) {
         Producto producto = new Producto();
         producto.setProductoId(productoDTO.getProductoId());
         producto.setNombre(productoDTO.getNombre());

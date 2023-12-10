@@ -17,7 +17,6 @@ public class UsuarioService{
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    //USUARIO
     public void addUsuario(UsuarioDTO usuarioDTO){
         Usuario usuario = convertirAEntidad(usuarioDTO);
         Carrito carrito = new Carrito();
@@ -53,6 +52,7 @@ public class UsuarioService{
         usuarioDTO.setNombre(usuario.getNombre());
         usuarioDTO.setCorreo(usuario.getCorreo());
         usuarioDTO.setContrasena(usuario.getContrasena());
+        usuarioDTO.setCarrito(usuario.getCarrito());
         return usuarioDTO;
     }
 
@@ -62,6 +62,7 @@ public class UsuarioService{
         usuario.setNombre(usuarioDTO.getNombre());
         usuario.setCorreo(usuarioDTO.getCorreo());
         usuario.setContrasena(usuarioDTO.getContrasena());
+        usuario.setCarrito(usuarioDTO.getCarrito());
         return usuario;
     }
 

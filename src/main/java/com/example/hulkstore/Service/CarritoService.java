@@ -29,16 +29,9 @@ public class CarritoService {
                 .collect(Collectors.toList());
     }
 
-    public List<CarritoDTO> getCarritoId(Long carritoId) {
+    public CarritoDTO getCarritoId(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
-        if (optionalCarrito.isPresent()) {
-            List<CarritoDTO> listaCarrito = new ArrayList<>();
-            listaCarrito.add(optionalCarrito.get());
-            return listaCarrito;
-        } else {
-            System.out.println("Carrito no encontrado");
-            return new ArrayList<>();
-        }
+        return convertirADTO(optionalCarrito.get());
     }
 
 
@@ -50,7 +43,7 @@ public class CarritoService {
     public void calcularTotal(Carrito carrito) {
         double valorTotal = 0.0;
         for (Producto producto : carrito.getProductos()) {
-            valorTotal += producto.getPrecio();
+            valorTotal += producto.getPrecio().doubleValue();
         }
         carrito.setCantidadProductos(carrito.getProductos().size());
         carrito.setValorTotal(valorTotal);
@@ -60,12 +53,13 @@ public class CarritoService {
     public void agregarProducto(Long carritoId, Long productoId) {
         Carrito carrito = obtenerCarritoPorId(carritoId);
 
-        Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
-        if (optionalProducto.isPresent()) {
-            ProductoDTO productoDTO = optionalProducto.get();
+        Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
+        if (optionalProductoDTO.isPresent()) {
+            ProductoDTO productoDTO = optionalProductoDTO.get();
 
             if (productoDTO.getCantidad() > 0) {
-                carrito.getProductos().add(productoDTO);
+                Producto producto = new Producto();
+                carrito.getProductos().add(producto);
                 productoDTO.setCantidad(productoDTO.getCantidad() - 1);
                 calcularTotal(carrito);
                 carritoRepository.save(carrito);
@@ -102,7 +96,7 @@ public class CarritoService {
 
     }
 
-    private CarritoDTO convertirADTO(Carrito carrito){
+    public CarritoDTO convertirADTO(Carrito carrito){
         CarritoDTO carritoDTO = new CarritoDTO();
         carritoDTO.setCarritoId(carrito.getCarritoId());
         carritoDTO.setCantidadProductos(carrito.getCantidadProductos());
@@ -110,7 +104,7 @@ public class CarritoService {
         return carritoDTO;
     }
 
-    private Carrito convertirAEntidad(CarritoDTO carritoDTO) {
+    public Carrito convertirAEntidad(CarritoDTO carritoDTO) {
         Carrito carrito = new Carrito();
         carrito.setCarritoId(carritoDTO.getCarritoId());
         carrito.setCantidadProductos(carritoDTO.getCantidadProductos());

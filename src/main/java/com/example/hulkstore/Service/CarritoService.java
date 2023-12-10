@@ -29,18 +29,15 @@ public class CarritoService {
                 .collect(Collectors.toList());
     }
 
-    public List<CarritoDTO> getCarritoId(Long carritoId) {
+    public CarritoDTO getCarritoId(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
+
         if (optionalCarrito.isPresent()) {
-            List<CarritoDTO> listaCarrito = new ArrayList<>();
-            listaCarrito.add(optionalCarrito.get());
-            return listaCarrito;
+            return convertirADTO(optionalCarrito.get());
         } else {
-            System.out.println("Carrito no encontrado");
-            return new ArrayList<>();
+            throw new Excepcion("Carrito no encontrado");
         }
     }
-
 
     public Carrito obtenerCarritoPorId(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
@@ -56,27 +53,27 @@ public class CarritoService {
         carrito.setValorTotal(valorTotal);
     }
 
-    @Transactional
-    public void agregarProducto(Long carritoId, Long productoId) {
-        Carrito carrito = obtenerCarritoPorId(carritoId);
-
-        Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
-        if (optionalProducto.isPresent()) {
-            ProductoDTO productoDTO = optionalProducto.get();
-
-            if (productoDTO.getCantidad() > 0) {
-                carrito.getProductos().add(productoDTO);
-                productoDTO.setCantidad(productoDTO.getCantidad() - 1);
-                calcularTotal(carrito);
-                carritoRepository.save(carrito);
-                productoService.updateProducto(productoDTO);
-            } else {
-                throw new Excepcion("No hay suficiente stock");
-            }
-        } else {
-            throw new Excepcion("Producto no encontrado");
-        }
-    }
+//    @Transactional
+//    public void agregarProducto(Long carritoId, Long productoId) {
+//        Carrito carrito = obtenerCarritoPorId(carritoId);
+//
+//        Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
+//        if (optionalProducto.isPresent()) {
+//            ProductoDTO productoDTO = optionalProducto.get();
+//
+//            if (productoDTO.getCantidad() > 0) {
+//                carrito.getProductos().add(productoDTO);
+//                productoDTO.setCantidad(productoDTO.getCantidad() - 1);
+//                calcularTotal(carrito);
+//                carritoRepository.save(carrito);
+//                productoService.updateProducto(productoDTO);
+//            } else {
+//                throw new Excepcion("No hay suficiente stock");
+//            }
+//        } else {
+//            throw new Excepcion("Producto no encontrado");
+//        }
+//    }
 
 
     @Transactional

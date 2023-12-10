@@ -29,4 +29,8 @@ public class Carrito {
     @JsonIgnore
     private Usuario usuario;
 
+    @Override
+    public String toString() {
+        return "Carrito{id=" + carritoId + "}";
+    }
 }

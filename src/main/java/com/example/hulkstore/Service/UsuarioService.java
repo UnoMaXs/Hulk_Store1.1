@@ -1,15 +1,14 @@
 package com.example.hulkstore.Service;
 
-import com.example.hulkstore.DTO.UsuarioDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Usuario;
+import com.example.hulkstore.Repository.ProductoRepository;
 import com.example.hulkstore.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService{
@@ -18,51 +17,27 @@ public class UsuarioService{
     private UsuarioRepository usuarioRepository;
 
     //USUARIO
-    public void addUsuario(UsuarioDTO usuarioDTO){
-        Usuario usuario = convertirAEntidad(usuarioDTO);
+    public void addUsuario(Usuario usuario){
         Carrito carrito = new Carrito();
         carrito.setUsuario(usuario);
         usuario.setCarrito(carrito);
         usuarioRepository.save(usuario);
     }
 
-    public List<UsuarioDTO> getUsuarios() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        return usuarios.stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<Usuario> getUsuarios() {
+        return usuarioRepository.findAll();
     }
 
-    public Optional<UsuarioDTO> getUsuariosById(Long usuarioId) {
-        Optional<Usuario> optionalUsuario = usuarioRepository.findById(usuarioId);
-        return optionalUsuario.map(this::convertirADTO);
+    public Optional<Usuario> getUsuariosById(Long usuarioId) {
+        return usuarioRepository.findById(usuarioId);
+    }
+
+    public void updateUsuario(Usuario usuario){
+        usuarioRepository.save(usuario);
     }
 
     public void deleteUsuarioById(Long id){
         usuarioRepository.deleteById(id);
-    }
-
-    public void updateUsuario(UsuarioDTO usuarioDTO){
-        Usuario usuario = convertirAEntidad(usuarioDTO);
-        usuarioRepository.save(usuario);
-    }
-
-    private UsuarioDTO convertirADTO(Usuario usuario) {
-        UsuarioDTO usuarioDTO = new UsuarioDTO();
-        usuarioDTO.setUsuarioId(usuario.getUsuarioId());
-        usuarioDTO.setNombre(usuario.getNombre());
-        usuarioDTO.setCorreo(usuario.getCorreo());
-        usuarioDTO.setContrasena(usuario.getContrasena());
-        return usuarioDTO;
-    }
-
-    private Usuario convertirAEntidad(UsuarioDTO usuarioDTO) {
-        Usuario usuario = new Usuario();
-        usuario.setUsuarioId(usuarioDTO.getUsuarioId());
-        usuario.setNombre(usuarioDTO.getNombre());
-        usuario.setCorreo(usuarioDTO.getCorreo());
-        usuario.setContrasena(usuarioDTO.getContrasena());
-        return usuario;
     }
 
 }

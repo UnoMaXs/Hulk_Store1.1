@@ -1,9 +1,8 @@
 package com.example.hulkstore.Service;
 
-import com.example.hulkstore.DTO.CarritoDTO;
-import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Producto;
+import com.example.hulkstore.Exceptions.Excepcion;
 import com.example.hulkstore.Repository.CarritoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CarritoService {
@@ -22,18 +20,21 @@ public class CarritoService {
     @Autowired
     private ProductoService productoService;
 
-    public List<CarritoDTO> getCarritos() {
-        List<Carrito> carritos = carritoRepository.findAll();
-        return carritos.stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<Carrito> verCarritos() {
+        return carritoRepository.findAll();
     }
 
-    public CarritoDTO getCarritoId(Long carritoId) {
+    public List<Carrito> verCarritoId(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
-        return convertirADTO(optionalCarrito.get());
+        if (optionalCarrito.isPresent()) {
+            List<Carrito> listaCarrito = new ArrayList<>();
+            listaCarrito.add(optionalCarrito.get());
+            return listaCarrito;
+        } else {
+            System.out.println("Carrito no encontrado");
+            return new ArrayList<>();
+        }
     }
-
 
     public Carrito obtenerCarritoPorId(Long carritoId) {
         Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
@@ -43,7 +44,7 @@ public class CarritoService {
     public void calcularTotal(Carrito carrito) {
         double valorTotal = 0.0;
         for (Producto producto : carrito.getProductos()) {
-            valorTotal += producto.getPrecio().doubleValue();
+            valorTotal += producto.getPrecio();
         }
         carrito.setCantidadProductos(carrito.getProductos().size());
         carrito.setValorTotal(valorTotal);
@@ -51,19 +52,35 @@ public class CarritoService {
 
     @Transactional
     public void agregarProducto(Long carritoId, Long productoId) {
+        System.out.println("Iniciando agregarProducto...");
+
         Carrito carrito = obtenerCarritoPorId(carritoId);
+        System.out.println("Carrito obtenido: " + carrito);
 
-        Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
-        if (optionalProductoDTO.isPresent()) {
-            ProductoDTO productoDTO = optionalProductoDTO.get();
+        Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
+        System.out.println("Optional<Producto> obtenido: " + optionalProducto);
 
-            if (productoDTO.getCantidad() > 0) {
-                Producto producto = new Producto();
+        if (optionalProducto.isPresent()) {
+            Producto producto = optionalProducto.get();
+
+            if (producto.getCantidad() > 0) {
+
                 carrito.getProductos().add(producto);
-                productoDTO.setCantidad(productoDTO.getCantidad() - 1);
+                System.out.println("Producto agregado al carrito: " + producto);
+
+                System.out.println("Cantidad de producto: " + producto.getCantidad());
+                producto.setCantidad(producto.getCantidad() - 1);
+                System.out.println("Cantidad del producto reducida: " + producto.getCantidad());
+
                 calcularTotal(carrito);
+                System.out.println("Total del carrito calculado: " + carrito.getValorTotal());
+
                 carritoRepository.save(carrito);
-                productoService.updateProducto(productoDTO);
+                System.out.println("Carrito guardado en la base de datos.");
+
+                productoService.actualizarProducto(producto);
+                System.out.println("Producto actualizado en la base de datos.");
+
             } else {
                 throw new Excepcion("No hay suficiente stock");
             }
@@ -77,40 +94,22 @@ public class CarritoService {
     public void eliminarProducto(Long carritoId, Long productoId) {
         Carrito carrito = obtenerCarritoPorId(carritoId);
 
-        boolean productoEnCarrito = carrito.getProductos().removeIf(producto -> producto.getProductoId().equals(productoId));
+        Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
 
-        if (productoEnCarrito) {
-            Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
 
-            if (optionalProducto.isPresent()) {
-                ProductoDTO producto = optionalProducto.get();
-
-                producto.setCantidad(producto.getCantidad() + 1);
-                calcularTotal(carrito);
-                carritoRepository.save(carrito);
-                productoService.updateProducto(producto);
-            } else {
-                throw new Excepcion("Producto no encontrado");
-            }
+        if (optionalProducto.isPresent()) {
+            Producto producto = optionalProducto.get();
+            System.out.println("Producto " + producto);
+            boolean productoEnCarrito = carrito.getProductos().removeIf(p -> p.getProductoId().equals(productoId));
+            producto.setCantidad(producto.getCantidad() + 1);
+            calcularTotal(carrito);
+            carritoRepository.save(carrito);
+            productoService.actualizarProducto(producto);
+        } else {
+            System.out.println("Producto no encontrado");
+            throw new Excepcion("Producto no encontrado");
         }
 
     }
 
-    public CarritoDTO convertirADTO(Carrito carrito){
-        CarritoDTO carritoDTO = new CarritoDTO();
-        carritoDTO.setCarritoId(carrito.getCarritoId());
-        carritoDTO.setCantidadProductos(carrito.getCantidadProductos());
-        carritoDTO.setValorTotal(carrito.getValorTotal());
-        return carritoDTO;
-    }
-
-    public Carrito convertirAEntidad(CarritoDTO carritoDTO) {
-        Carrito carrito = new Carrito();
-        carrito.setCarritoId(carritoDTO.getCarritoId());
-        carrito.setCantidadProductos(carritoDTO.getCantidadProductos());
-        carrito.setValorTotal(carritoDTO.getValorTotal());
-        return carrito;
-    }
-
 }
-

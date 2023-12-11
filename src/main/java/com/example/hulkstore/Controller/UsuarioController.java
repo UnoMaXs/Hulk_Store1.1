@@ -1,6 +1,5 @@
 package com.example.hulkstore.Controller;
 
-import com.example.hulkstore.DTO.UsuarioDTO;
 import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Service.ProductoService;
 import com.example.hulkstore.Service.UsuarioService;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 
+
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController {
@@ -18,25 +18,25 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping("/addUsuario")//Agregar usuario
-    public void saveUsuario(@RequestBody UsuarioDTO usuarioDTO) {
-        usuarioService.addUsuario(usuarioDTO);
+    @PostMapping("/addUsuario")
+    public void saveUsuario(@RequestBody Usuario usuario) {
+        usuarioService.addUsuario(usuario);
     }
 
-    @GetMapping("/verUsuarios")//Ver usuarios
-    public List<UsuarioDTO> getUsuarios() {
+    @GetMapping("/verUsuarios")
+    public List<Usuario> getUsuarios() {
         return usuarioService.getUsuarios();
     }
 
     @GetMapping("/usuario/{usuarioId}")//Listar usuarios
-    public Optional<UsuarioDTO> getUsuariosById(@PathVariable("usuarioId") Long usuarioId) {
+    public Optional<Usuario> getUsuariosById(@PathVariable("usuarioId") Long usuarioId) {
         return usuarioService.getUsuariosById(usuarioId);
     }
 
     @PutMapping("/updateUsuario/{usuarioId}")//Actualizar usuario
-    public void updateUsuario(@PathVariable("usuarioId") Long usuarioId, @RequestBody UsuarioDTO usuarioDTO) {
-        usuarioDTO.setUsuarioId(usuarioId);
-        usuarioService.updateUsuario(usuarioDTO);
+    public void updateUsuario(@PathVariable("usuarioId") Long usuarioId, @RequestBody Usuario usuario) {
+        usuario.setUsuarioId(usuarioId);
+        usuarioService.updateUsuario(usuario);
     }
 
     @DeleteMapping("/deleteUsuario/{usuarioId}")//Borrar usuario

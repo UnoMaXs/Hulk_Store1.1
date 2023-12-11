@@ -32,23 +32,51 @@ public class AdminController {
     }
 
     @GetMapping("/verAdmins/{adminId}")//Listar usuarios
-    public Optional<AdminDTO> getAdminById(@PathVariable("adminId") Long adminId) {
-        return adminService.getAdminById(adminId);
+    public ResponseEntity<AdminDTO> getAdminById(@PathVariable("adminId") Long adminId) {
+        try{
+            Optional<AdminDTO> adminOptional = adminService.getAdminById(adminId);
+            if(adminOptional.isPresent()){
+                return ResponseEntity.ok(adminOptional.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
 
     @PostMapping("/addAdmin")//Agregar admin
     public void addAdmin(@RequestBody Admin admin) {
-        adminService.addAdmin(admin);
-    }
-
-    @DeleteMapping("/deleteAdmin/{adminId}")//Borrar admin
-    public void deleteAdminById(@PathVariable("adminId") Long adminId) {
-        adminService.deleteAdminById(adminId);
+        try {
+            adminService.addAdmin(admin);
+            ResponseEntity.ok("Admin añadido correctamente");
+        } catch (Exception e) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al agregar Administrador");
+        }
     }
 
     @PutMapping("/updateAdmin/{adminId}")//Actualizar admin
-    public void updateAdmin(@PathVariable("adminId") Long adminId, @RequestBody Admin admin) {
-        admin.setAdminId(adminId);
-        adminService.updateAdmin(admin);
+    public ResponseEntity<String> updateAdmin(@PathVariable("adminId") Long adminId, @RequestBody Admin admin) {
+        try {
+            admin.setAdminId(adminId);
+            adminService.updateAdmin(admin);
+            return  ResponseEntity.ok("Administrado actualizado exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar el Administrador");
+        }
     }
+    @DeleteMapping("/deleteAdmin/{adminId}")//Borrar admin
+    public ResponseEntity<String> deleteAdminById(@PathVariable("adminId") Long adminId) {
+        try {
+            adminService.deleteAdminById(adminId);
+            return ResponseEntity.ok("Administrador eliminado correctamente");
+        } catch (Exception e) {
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                 .body("Error al eliminar administrador");
+        }
+    }
+
 }

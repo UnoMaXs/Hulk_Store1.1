@@ -16,22 +16,20 @@ import java.util.logging.Logger;
 public class AdminService {
 
     Logger logger = Logger.getLogger(getClass().getName());
-    AdminDTO adminDTO;
 
     @Autowired
     private AdminRepository adminRepository;
     @Autowired
     private ModelMapper modelMapper;
+    AdminDTO adminDTO;
 
     public List<AdminDTO> getAdmins() {
         try {
             List<Admin> admins = adminRepository.findAll();
-
             List<AdminDTO> adminDTO = new ArrayList<>();
             for (Admin admin : admins) {
                 adminDTO.add(modelMapper.map(admin, AdminDTO.class));
             }
-
             return adminDTO;
         } catch (Exception e) {
             logger.info("Ocurrió un error al obtener la lista de admins: " + e.getMessage());
@@ -65,6 +63,15 @@ public class AdminService {
         }
     }
 
+    public void updateAdmin(Admin admin) {
+        try {
+            adminRepository.save(admin);
+            adminDTO = modelMapper.map(admin, AdminDTO.class);
+            logger.info("Administrador actualizado correctamente");
+        } catch (Exception e) {
+            logger.info("Ocurrió un error al actualizar el admin: " + e.getMessage());
+        }
+    }
     public void deleteAdminById(Long AdminId) {
         try {
             Optional<Admin> optionalAdmin = adminRepository.findById(AdminId);
@@ -80,13 +87,4 @@ public class AdminService {
         }
     }
 
-    public void updateAdmin(Admin admin) {
-        try {
-            adminRepository.save(admin);
-            adminDTO = modelMapper.map(admin, AdminDTO.class);
-            logger.info("Administrador actualizad correctamente");
-        } catch (Exception e) {
-            logger.info("Ocurrió un error al actualizar el admin: " + e.getMessage());
-        }
-    }
 }

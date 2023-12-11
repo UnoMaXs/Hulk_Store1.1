@@ -1,4 +1,4 @@
-package com.example.hulkstore.Service;
+package com.example.hulkstore.Exceptions;
 
 public class Excepcion extends RuntimeException {
     public Excepcion(String mensaje) {

@@ -1,7 +1,7 @@
 package com.example.hulkstore.Controller;
 
+
 import com.example.hulkstore.Entity.Admin;
-import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,6 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
-    //ADMIN
     @GetMapping("/admins")//Listar admins
     public List<Admin> getAdmins() {
         return adminService.getAdmins();

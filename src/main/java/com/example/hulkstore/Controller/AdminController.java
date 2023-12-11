@@ -1,14 +1,16 @@
 package com.example.hulkstore.Controller;
 
-
+import com.example.hulkstore.DTO.AdminDTO;
 import com.example.hulkstore.Entity.Admin;
 import com.example.hulkstore.Service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/admin")
@@ -17,12 +19,20 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
-    @GetMapping("/admins")//Listar admins
-    public List<Admin> getAdmins() {
-        return adminService.getAdmins();
+    @GetMapping("/verAdmins") // Listar admins
+    public ResponseEntity<List<AdminDTO>> getAdmins() {
+        try {
+            List<AdminDTO> admins = adminService.getAdmins();
+            return ResponseEntity.ok(admins);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
     }
+
     @GetMapping("/verAdmins/{adminId}")//Listar usuarios
-    public Optional<Admin> getAdminById(@PathVariable("adminId") Long adminId) {
+    public Optional<AdminDTO> getAdminById(@PathVariable("adminId") Long adminId) {
         return adminService.getAdminById(adminId);
     }
 
@@ -41,5 +51,4 @@ public class AdminController {
         admin.setAdminId(adminId);
         adminService.updateAdmin(admin);
     }
-
 }

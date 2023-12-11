@@ -11,9 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class CarritoService {
+
+    Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     private CarritoRepository carritoRepository;
@@ -24,7 +27,7 @@ public class CarritoService {
         try {
             return carritoRepository.findAll();
         } catch (Exception e) {
-            System.err.println("Ocurrió un error al obtener la lista de carritos: " + e.getMessage());
+            logger.info("Ocurrió un error al obtener la lista de carritos: " + e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -37,11 +40,11 @@ public class CarritoService {
                 listaCarrito.add(optionalCarrito.get());
                 return listaCarrito;
             } else {
-                System.out.println("Carrito no encontrado");
+                logger.info("Carrito no encontrado");
                 return new ArrayList<>();
             }
         } catch (Exception e) {
-            System.err.println("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
+            logger.info("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -51,7 +54,7 @@ public class CarritoService {
             Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
             return optionalCarrito.orElseThrow(() -> new CarritoException("Carrito no encontrado"));
         } catch (Exception e) {
-            System.err.println("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
+            logger.info("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
             throw new CarritoException("Ocurrió un error al obtener el carrito por ID");
         }
     }
@@ -65,20 +68,20 @@ public class CarritoService {
             carrito.setCantidadProductos(carrito.getProductos().size());
             carrito.setValorTotal(valorTotal);
         } catch (Exception e) {
-            System.err.println("Ocurrió un error al calcular el total del carrito: " + e.getMessage());
+            logger.info("Ocurrió un error al calcular el total del carrito: " + e.getMessage());
         }
     }
 
     @Transactional
     public void agregarProducto(Long carritoId, Long productoId) {
         try {
-            System.out.println("Iniciando agregarProducto...");
+            logger.info("Iniciando agregarProducto...");
 
             Carrito carrito = obtenerCarritoPorId(carritoId);
-            System.out.println("Carrito obtenido: " + carrito);
+            logger.info("Carrito obtenido: " + carrito);
 
             Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
-            System.out.println("Optional<Producto> obtenido: " + optionalProducto);
+            logger.info("Optional<Producto> obtenido: " + optionalProducto);
 
             if (optionalProducto.isPresent()) {
                 Producto producto = optionalProducto.get();
@@ -105,7 +108,7 @@ public class CarritoService {
                     carritoRepository.save(carrito);
                     productoService.actualizarProducto(producto);
 
-                    System.out.println("Producto(s) agregado(s) al carrito: " + producto);
+                    logger.info("Producto(s) agregado(s) al carrito: " + producto);
                 } else {
                     throw new CarritoException("No hay suficiente stock");
                 }
@@ -113,7 +116,7 @@ public class CarritoService {
                 throw new CarritoException("Producto no encontrado");
             }
         } catch (Exception e) {
-            System.err.println("Ocurrió un error al agregar el producto al carrito: " + e.getMessage());
+            logger.info("Ocurrió un error al agregar el producto al carrito: " + e.getMessage());
             throw new CarritoException("Ocurrió un error al agregar el producto al carrito");
         }
     }
@@ -122,13 +125,13 @@ public class CarritoService {
     @Transactional
     public void eliminarProducto(Long carritoId, Long productoId) {
         try {
-            System.out.println("Iniciando eliminarProducto...");
+            logger.info("Iniciando eliminarProducto...");
 
             Carrito carrito = obtenerCarritoPorId(carritoId);
-            System.out.println("Carrito obtenido: " + carrito);
+            logger.info("Carrito obtenido: " + carrito);
 
             Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
-            System.out.println("Optional<Producto> obtenido: " + optionalProducto);
+            logger.info("Optional<Producto> obtenido: " + optionalProducto);
 
             if (optionalProducto.isPresent()) {
                 Producto producto = optionalProducto.get();
@@ -153,7 +156,7 @@ public class CarritoService {
                     carritoRepository.save(carrito);
                     productoService.actualizarProducto(producto);
 
-                    System.out.println("Producto eliminado del carrito: " + producto);
+                    logger.info("Producto eliminado del carrito: " + producto);
                 } else {
                     throw new CarritoException("Producto no encontrado en el carrito");
                 }
@@ -162,7 +165,8 @@ public class CarritoService {
             }
         } catch (Exception e) {
             // Maneja otras excepciones de manera adecuada.
-            System.err.println("Ocurrió un error al eliminar el producto del carrito: " + e.getMessage());
+            logger.info("Ocurrió un error al eliminar el producto del carrito: " + e.getMessage());
             throw new CarritoException("Ocurrió un error al eliminar el producto del carrito");
         }
     }
+}

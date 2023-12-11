@@ -1,7 +1,6 @@
 package com.example.hulkstore.Controller;
 
 import com.example.hulkstore.Entity.Usuario;
-import com.example.hulkstore.Service.ProductoService;
 import com.example.hulkstore.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/usuario/{usuarioId}")//Listar usuarios
-    public Optional<Usuario> getUsuariosById(@PathVariable("usuarioId") Long usuarioId) {
+    public Optional<Object> getUsuariosById(@PathVariable("usuarioId") Long usuarioId) {
         return usuarioService.getUsuariosById(usuarioId);
     }
 

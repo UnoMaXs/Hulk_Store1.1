@@ -1,5 +1,6 @@
 package com.example.hulkstore.DTO;
 
+import com.example.hulkstore.Entity.Carrito;
 import lombok.Data;
 
 @Data
@@ -8,4 +9,5 @@ public class ProductoDTO {
     private String nombre;
     private int cantidad;
     private Long precio;
+    private Carrito carrito;
 }

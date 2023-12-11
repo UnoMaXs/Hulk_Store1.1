@@ -84,7 +84,6 @@ public class CarritoService {
                 Producto producto = optionalProducto.get();
 
                 if (producto.getCantidad() > 0) {
-                    // Verifica si el producto ya está en el carrito y actualiza la cantidad.
                     boolean existeEnCarrito = false;
 
                     for (Producto p : carrito.getProductos()) {
@@ -96,16 +95,13 @@ public class CarritoService {
                     }
 
                     if (!existeEnCarrito) {
-                        // Agrega un nuevo producto al carrito.
                         producto.setCantidad(1);
                         carrito.getProductos().add(producto);
                     }
 
-                    // Actualiza la cantidad en el inventario y el valor total del carrito.
                     producto.setCantidad(producto.getCantidad() - 1);
                     calcularTotal(carrito);
 
-                    // Guarda los cambios en el carrito y actualiza el producto.
                     carritoRepository.save(carrito);
                     productoService.actualizarProducto(producto);
 
@@ -117,7 +113,6 @@ public class CarritoService {
                 throw new CarritoException("Producto no encontrado");
             }
         } catch (Exception e) {
-            // Maneja otras excepciones de manera adecuada.
             System.err.println("Ocurrió un error al agregar el producto al carrito: " + e.getMessage());
             throw new CarritoException("Ocurrió un error al agregar el producto al carrito");
         }

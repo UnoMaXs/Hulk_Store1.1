@@ -1,9 +1,7 @@
 package com.example.hulkstore.Service;
 
-import com.example.hulkstore.Entity.Carrito;
-import com.example.hulkstore.Entity.Usuario;
+import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Repository.ProductoRepository;
-import com.example.hulkstore.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,33 +9,36 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UsuarioService{
+public class ProductoService {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private ProductoRepository productoRepository;
 
-    //USUARIO
-    public void addUsuario(Usuario usuario){
-        Carrito carrito = new Carrito();
-        carrito.setUsuario(usuario);
-        usuario.setCarrito(carrito);
-        usuarioRepository.save(usuario);
+    public List<Producto> obtenerProductos(){
+        return productoRepository.findAll();
     }
 
-    public List<Usuario> getUsuarios() {
-        return usuarioRepository.findAll();
+    public Optional<Producto> obtenerProductoPorId(Long productoId){
+        return productoRepository.findById(productoId);
     }
 
-    public Optional<Usuario> getUsuariosById(Long usuarioId) {
-        return usuarioRepository.findById(usuarioId);
+    public void agregarProducto(Producto producto){
+        productoRepository.save(producto);
     }
 
-    public void updateUsuario(Usuario usuario){
-        usuarioRepository.save(usuario);
+    public void borrarProducto(Long productoId){
+        Optional<Producto> productoOptional = productoRepository.findById(productoId);
+
+        if(productoOptional.isPresent()){
+            Producto producto = productoOptional.get();
+            productoRepository.delete(producto);
+        } else {
+            System.out.println("No se encuentra el producto");
+        }
     }
 
-    public void deleteUsuarioById(Long id){
-        usuarioRepository.deleteById(id);
+    public void actualizarProducto(Producto producto){
+        productoRepository.save(producto);
     }
 
 }

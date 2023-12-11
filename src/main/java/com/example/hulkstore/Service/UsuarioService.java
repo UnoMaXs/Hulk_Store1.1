@@ -1,8 +1,5 @@
 package com.example.hulkstore.Service;
 
-import com.example.hulkstore.Entity.Carrito;
-import com.example.hulkstore.Entity.Usuario;
-import com.example.hulkstore.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +55,37 @@ public class UsuarioService {
         } catch (Exception e) {
             System.err.println("Ocurrió un error al eliminar el usuario por ID: " + e.getMessage());
         }
+=======
+public class ProductoService {
+
+    @Autowired
+    private ProductoRepository productoRepository;
+
+    public List<Producto> obtenerProductos(){
+        return productoRepository.findAll();
+    }
+
+    public Optional<Producto> obtenerProductoPorId(Long productoId){
+        return productoRepository.findById(productoId);
+    }
+
+    public void agregarProducto(Producto producto){
+        productoRepository.save(producto);
+    }
+
+    public void borrarProducto(Long productoId){
+        Optional<Producto> productoOptional = productoRepository.findById(productoId);
+
+        if(productoOptional.isPresent()){
+            Producto producto = productoOptional.get();
+            productoRepository.delete(producto);
+        } else {
+            System.out.println("No se encuentra el producto");
+        }
+    }
+
+    public void actualizarProducto(Producto producto){
+        productoRepository.save(producto);
     }
 }
 

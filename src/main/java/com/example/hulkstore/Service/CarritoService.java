@@ -171,7 +171,3 @@ public class CarritoService {
             throw new CarritoException("Ocurrió un error al eliminar el producto del carrito");
         }
     }
-
-}
-
-

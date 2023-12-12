@@ -32,13 +32,15 @@ public class AdminController {
     }
 
     @GetMapping("/verAdmin/{adminId}")//Listar usuarios
-    public ResponseEntity<AdminDTO> getAdminById(@PathVariable("adminId") Long adminId) {
+    public ResponseEntity<Object> getAdminById(@PathVariable("adminId") Long adminId) {
         try{
-            Optional<AdminDTO> adminOptional = adminService.getAdminById(adminId);
-            if(adminOptional.isPresent()){
+            Optional<AdminDTO> optionalAdmin = adminService.getAdminById(adminId);
+            if(optionalAdmin.isPresent()){
+                Optional<AdminDTO> adminOptional = adminService.getAdminById(adminId);
                 return ResponseEntity.ok(adminOptional.get());
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No existe administrador con la id: " + adminId);
             }
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

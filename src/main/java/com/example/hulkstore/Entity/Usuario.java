@@ -18,8 +18,8 @@ public class Usuario {
     private String correo;
     @NotEmpty
     private String contrasena;
-
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JoinColumn(name= "carrito_id")
     private Carrito carrito;
 
 }

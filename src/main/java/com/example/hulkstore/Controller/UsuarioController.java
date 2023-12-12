@@ -31,12 +31,19 @@ public class UsuarioController {
                     .body(Collections.emptyList());
         }
     }
-    @GetMapping("/usuario/{usuarioId}")//Listar usuarios
+
+    @GetMapping("/verUsuario/{usuarioId}")//Listar usuarios
     public ResponseEntity<Object> getUsuariosById(@PathVariable("usuarioId") Long usuarioId) {
         try {
-            Optional<Object> usuarioOptional = usuarioService.getUsuariosById(usuarioId);
-            return ResponseEntity.ok(usuarioOptional.get());
-        } catch (Exception e){
+            Optional<UsuarioDTO> optionalUsuario = usuarioService.getUsuarioById(usuarioId);
+            if (optionalUsuario.isPresent()) {
+                Optional<UsuarioDTO> usuarioOptional = usuarioService.getUsuarioById(usuarioId);
+                return ResponseEntity.ok(usuarioOptional.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No existe usuario con la id: " + usuarioId);
+            }
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(null);
         }
@@ -57,9 +64,15 @@ public class UsuarioController {
     @PutMapping("/updateUsuario/{usuarioId}")//Actualizar usuario
     public ResponseEntity<String> updateUsuario(@PathVariable("usuarioId") Long usuarioId, @RequestBody Usuario usuario) {
         try {
-            usuario.setUsuarioId(usuarioId);
-            usuarioService.updateUsuario(usuario);
-            return ResponseEntity.ok("Usuario actualizado correctamente");
+            Optional<UsuarioDTO> optionalUsuario = usuarioService.getUsuarioById(usuarioId);
+            if (optionalUsuario.isPresent()) {
+                usuario.setUsuarioId(usuarioId);
+                usuarioService.updateUsuario(usuario);
+                return ResponseEntity.ok("Usuario actualizado correctamente");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No existe usuario con la id: " + usuarioId);
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al actualizar el usuario");
@@ -69,9 +82,14 @@ public class UsuarioController {
     @DeleteMapping("/deleteUsuario/{usuarioId}")//Borrar usuario
     public ResponseEntity<String> deleteUsuarioById(@PathVariable("usuarioId") Long usuarioId) {
         try {
-            usuarioService.deleteUsuarioById(usuarioId);
-            return ResponseEntity.ok("Usuario eliminado correctamente");
-
+            Optional<UsuarioDTO> optionalUsuario = usuarioService.getUsuarioById(usuarioId);
+            if (optionalUsuario.isPresent()) {
+                usuarioService.deleteUsuarioById(usuarioId);
+                return ResponseEntity.ok("Usuario eliminado correctamente");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No existe usuario con la id: " + usuarioId);
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al eliminar usuario");

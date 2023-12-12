@@ -31,7 +31,7 @@ public class UsuarioService {
             usuario.setCarrito(carrito);
             usuarioRepository.save(usuario);
             usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
-            logger.info("Usuario agregado correctamente");
+            logger.info("Usuario agregado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al agregar el usuario: " + e.getMessage());
         }
@@ -51,7 +51,7 @@ public class UsuarioService {
         }
     }
 
-    public Optional<Object> getUsuariosById(Long usuarioId) {
+    public Optional<UsuarioDTO> getUsuarioById(Long usuarioId) {
         try {
             Optional<Usuario> optionalUsuario = usuarioRepository.findById(usuarioId);
             if (optionalUsuario.isPresent()) {
@@ -70,7 +70,7 @@ public class UsuarioService {
         try {
             usuarioRepository.save(usuario);
             usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
-            logger.info("Usuario actualizado correctamente");
+            logger.info("Usuario actualizado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al actualizar el usuario: " + e.getMessage());
         }
@@ -82,7 +82,7 @@ public class UsuarioService {
             if (optionalUsuario.isPresent()){
                 usuarioRepository.deleteById(UsuarioId);
                 usuarioDTO = modelMapper.map(optionalUsuario, UsuarioDTO.class);
-                logger.info("Usuario eliminado correctamente");
+                logger.info("Usuario eliminado correctamente en el servicio");
             }
         } catch (Exception e) {
             logger.info("Ocurrió un error al eliminar el usuario por ID: " + e.getMessage());

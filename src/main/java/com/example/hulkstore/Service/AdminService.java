@@ -2,6 +2,8 @@ package com.example.hulkstore.Service;
 
 import com.example.hulkstore.DTO.AdminDTO;
 import com.example.hulkstore.Entity.Admin;
+import com.example.hulkstore.Exceptions.AdminException;
+import com.example.hulkstore.Exceptions.ProductoException;
 import com.example.hulkstore.Repository.AdminRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,7 @@ public class AdminService {
     private AdminRepository adminRepository;
     @Autowired
     private ModelMapper modelMapper;
-    AdminDTO adminDTO;
+    private AdminDTO adminDTO;
 
     public List<AdminDTO> getAdmins() {
         try {
@@ -33,7 +35,7 @@ public class AdminService {
             return adminDTO;
         } catch (Exception e) {
             logger.info("Ocurrió un error al obtener la lista de admins: " + e.getMessage());
-            return null;
+            throw new AdminException("Ocurrió un error al obtener la lista de productos");
         }
     }
 
@@ -49,7 +51,7 @@ public class AdminService {
             }
         } catch (Exception e) {
             logger.info("Ocurrió un error al obtener el admin por ID: " + e.getMessage());
-            return Optional.empty();
+            throw new AdminException("Ocurrió un error al obtener el admin");
         }
     }
 
@@ -60,6 +62,7 @@ public class AdminService {
             logger.info("Administrador agregado correctamente desde servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al agregar el admin: " + e.getMessage());
+            throw new AdminException("Ocurrió un error al agregar el admin");
         }
     }
 
@@ -70,6 +73,7 @@ public class AdminService {
             logger.info("Administrador actualizado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al actualizar el admin: " + e.getMessage());
+            throw new AdminException("Ocurrió un error al actualizar el producto");
         }
     }
     public void deleteAdminById(Long AdminId) {
@@ -82,10 +86,11 @@ public class AdminService {
                 adminDTO = modelMapper.map(optionalAdmin, AdminDTO.class);
                 logger.info("Administrador eliminado correctamente en el servicio");
             } else {
-                logger.info("No existe administrador con esa id"+AdminId);
+                logger.info("No existe administrador con esa id" + AdminId);
             }
         } catch (Exception e) {
             logger.info("Ocurrió un error al eliminar el admin por ID: " + e.getMessage());
+            throw new ProductoException("Ocurrió un error al borrar el admin");
         }
     }
 

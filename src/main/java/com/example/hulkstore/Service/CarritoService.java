@@ -145,7 +145,6 @@ public class CarritoService {
 
                 boolean productoEnCarrito = false;
 
-                // Verifica si el producto está en el carrito y lo elimina.
                 for (Producto p : carrito.getProductos()) {
                     if (p.getProductoId().equals(productoId)) {
                         productoEnCarrito = true;

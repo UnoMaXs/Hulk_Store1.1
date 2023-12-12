@@ -22,20 +22,7 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ModelMapper modelMapper;
-    UsuarioDTO usuarioDTO;
-
-    public void addUsuario(Usuario usuario) {
-        try {
-            Carrito carrito = new Carrito();
-            carrito.setUsuario(usuario);
-            usuario.setCarrito(carrito);
-            usuarioRepository.save(usuario);
-            usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
-            logger.info("Usuario agregado correctamente en el servicio");
-        } catch (Exception e) {
-            logger.info("Ocurrió un error al agregar el usuario: " + e.getMessage());
-        }
-    }
+    private UsuarioDTO usuarioDTO;
 
     public List<UsuarioDTO> getUsuarios() {
         try {
@@ -63,6 +50,19 @@ public class UsuarioService {
         } catch (Exception e) {
             logger.info("Ocurrió un error al obtener el usuario por ID: " + e.getMessage());
             return Optional.empty();
+        }
+    }
+
+    public void addUsuario(Usuario usuario) {
+        try {
+            Carrito carrito = new Carrito();
+            carrito.setUsuario(usuario);
+            usuario.setCarrito(carrito);
+            usuarioRepository.save(usuario);
+            usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
+            logger.info("Usuario agregado correctamente en el servicio");
+        } catch (Exception e) {
+            logger.info("Ocurrió un error al agregar el usuario: " + e.getMessage());
         }
     }
 

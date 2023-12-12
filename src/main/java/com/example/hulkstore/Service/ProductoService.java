@@ -25,17 +25,6 @@ public class ProductoService {
     private ProductoDTO productoDTO;
 
 
-    public void addProducto(Producto producto) {
-        try {
-            productoRepository.save(producto);
-            productoDTO = modelMapper.map(producto, ProductoDTO.class);
-            logger.info("Producto agregado correctamente en el servicio");
-        } catch (Exception e) {
-            logger.info("Ocurrió un error al agregar el producto: " + e.getMessage());
-            throw new ProductoException("Ocurrió un error al agregar el producto");
-        }
-    }
-
     public List<ProductoDTO> getProductos() {
         try {
             List<Producto> productos = productoRepository.findAll();
@@ -63,6 +52,17 @@ public class ProductoService {
         } catch (Exception e) {
             logger.info("Ocurrió un error al obtener el producto por ID: " + e.getMessage());
             throw new ProductoException("Ocurrió un error al obtener el producto por ID");
+        }
+    }
+
+    public void addProducto(Producto producto) {
+        try {
+            productoRepository.save(producto);
+            productoDTO = modelMapper.map(producto, ProductoDTO.class);
+            logger.info("Producto agregado correctamente en el servicio");
+        } catch (Exception e) {
+            logger.info("Ocurrió un error al agregar el producto: " + e.getMessage());
+            throw new ProductoException("Ocurrió un error al agregar el producto");
         }
     }
 

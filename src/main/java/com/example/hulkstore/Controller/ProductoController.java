@@ -31,11 +31,17 @@ public class ProductoController {
         }
     }
 
-    @GetMapping("/producto/{productoId}")//Listar usuarios
+    @GetMapping("/verProducto/{productoId}")//Llamar producto por ID
     public ResponseEntity<Object> getProductoById(@PathVariable("productoId") Long productoId) {
         try {
-            Optional<ProductoDTO> productoOptional = productoService.getProductoById(productoId);
-            return ResponseEntity.ok(productoOptional.get());
+            Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
+            if (optionalProducto.isPresent()) {
+                Optional<ProductoDTO> productoOptional = productoService.getProductoById(productoId);
+                return ResponseEntity.ok(productoOptional.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No existe producto con la id: " + productoId);
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(null);
@@ -56,8 +62,8 @@ public class ProductoController {
     @PutMapping("/updateProducto/{productoId}") // Actualizar producto
     public ResponseEntity<String> updateProducto(@PathVariable("productoId") Long productoId, @RequestBody Producto producto) {
         try {
-            Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
-            if (optionalProductoDTO.isPresent()) {
+            Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
+            if (optionalProducto.isPresent()) {
                 producto.setProductoId(productoId);
                 productoService.updateProducto(producto);
                 return ResponseEntity.ok("Producto actualizado correctamente");
@@ -74,8 +80,8 @@ public class ProductoController {
     @DeleteMapping("/deleteProducto/{productoId}") // Borrar producto
     public ResponseEntity<String> deleteProducto(@PathVariable Long productoId) {
         try {
-            Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
-            if (optionalProductoDTO.isPresent()) {
+            Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
+            if (optionalProducto.isPresent()) {
                 productoService.deleteProductoById(productoId);
                 return ResponseEntity.ok("producto eliminado correctamente");
             } else {

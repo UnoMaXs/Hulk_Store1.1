@@ -23,8 +23,8 @@ public class UsuarioController {
     @GetMapping("/verUsuarios")
     public ResponseEntity<List<UsuarioDTO>> getUsuarios() {
         try {
-            List<UsuarioDTO> usuarios = usuarioService.getUsuarios();
-            return ResponseEntity.ok(usuarios);
+            List<UsuarioDTO> usuarioDTO = usuarioService.getUsuarios();
+            return ResponseEntity.ok(usuarioDTO);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -1,11 +1,16 @@
 package com.example.hulkstore.Controller;
 
+import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/producto")
@@ -15,23 +20,59 @@ public class ProductoController {
     ProductoService productoService;
 
     @GetMapping("/verProductos") // Listar productos
-    public List<Producto> getProductos() {
-        return productoService.obtenerProductos();
+    public ResponseEntity<List<ProductoDTO>> getProductos() {
+        try {
+            List<ProductoDTO> productoDTO = productoService.getProductos();
+            return ResponseEntity.ok(productoDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
+    }
+
+    @GetMapping("/producto/{productoId}")//Listar usuarios
+    public ResponseEntity<Object> getProductoById(@PathVariable("productoId") Long productoId) {
+        try {
+            Optional<ProductoDTO> productoOptional = productoService.getProductoById(productoId);
+            return ResponseEntity.ok(productoOptional.get());
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
 
     @PostMapping("/addProducto") // Agregar producto
-    public void addProducto(@RequestBody Producto producto) {
-        productoService.agregarProducto(producto);
+    public ResponseEntity<String> addProducto(@RequestBody Producto producto) {
+        try {
+            productoService.addProducto(producto);
+            return ResponseEntity.ok("Producto agregado correctamente");
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al agregar producto");
+        }
     }
 
     @PutMapping("/updateProducto/{productoId}") // Actualizar producto
-    public void updateProducto(@PathVariable("productoId") Long productoId, @RequestBody Producto producto) {
-        producto.setProductoId(productoId);
-        productoService.actualizarProducto(producto);
+    public ResponseEntity<String> updateProducto(@PathVariable("productoId") Long productoId, @RequestBody Producto producto) {
+        try {
+            producto.setProductoId(productoId);
+            productoService.updateProducto(producto);
+            return ResponseEntity.ok("Producto actualizado correctamente");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar el producto");
+        }
     }
 
     @DeleteMapping("/deleteProducto/{productoId}") // Borrar producto
-    public void deleteProducto(@PathVariable Long productoId) {
-        productoService.borrarProducto(productoId);
+    public ResponseEntity<String> deleteProducto(@PathVariable Long productoId) {
+        try {
+            productoService.deleteProductoById(productoId);
+            return ResponseEntity.ok("Usuario eliminado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar producto");
+        }
     }
 }

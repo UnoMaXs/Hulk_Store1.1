@@ -54,10 +54,9 @@ public class UsuarioService {
     public Optional<Object> getUsuariosById(Long usuarioId) {
         try {
             Optional<Usuario> optionalUsuario = usuarioRepository.findById(usuarioId);
-
             if (optionalUsuario.isPresent()) {
                 Usuario usuario = optionalUsuario.get();
-                return Optional.of(modelMapper.map(usuario, Usuario.class));
+                return Optional.of(modelMapper.map(usuario, UsuarioDTO.class));
             } else {
                 return Optional.empty();
             }
@@ -82,7 +81,6 @@ public class UsuarioService {
             Optional<Usuario> optionalUsuario = usuarioRepository.findById(UsuarioId);
             if (optionalUsuario.isPresent()){
                 usuarioRepository.deleteById(UsuarioId);
-
                 usuarioDTO = modelMapper.map(optionalUsuario, UsuarioDTO.class);
                 logger.info("Usuario eliminado correctamente");
             }

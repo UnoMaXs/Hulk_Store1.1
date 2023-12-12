@@ -1,5 +1,6 @@
 package com.example.hulkstore.Service;
 
+import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Exceptions.CarritoException;
@@ -75,18 +76,14 @@ public class CarritoService {
     @Transactional
     public void agregarProducto(Long carritoId, Long productoId) {
         try {
-            logger.info("Iniciando agregarProducto...");
-
             Carrito carrito = obtenerCarritoPorId(carritoId);
-            logger.info("Carrito obtenido: " + carrito);
 
-            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
-            logger.info("Optional<Producto> obtenido: " + optionalProducto);
+            Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
 
-            if (optionalProducto.isPresent()) {
-                Producto producto = optionalProducto.get();
+            if (optionalProductoDTO.isPresent()) {
+                ProductoDTO productoDTO = optionalProductoDTO.get();
 
-                if (producto.getCantidad() > 0) {
+                if (productoDTO.getCantidad() > 0) {
                     boolean existeEnCarrito = false;
 
                     for (Producto p : carrito.getProductos()) {
@@ -98,17 +95,17 @@ public class CarritoService {
                     }
 
                     if (!existeEnCarrito) {
-                        producto.setCantidad(1);
-                        carrito.getProductos().add(producto);
+                        productoDTO.setCantidad(1);
+                        carrito.getProductos().add(ProductoDTO);
                     }
 
-                    producto.setCantidad(producto.getCantidad() - 1);
+                    productoDTO.setCantidad(ProductoDTO.getCantidad() - 1);
                     calcularTotal(carrito);
 
                     carritoRepository.save(carrito);
-                    productoService.actualizarProducto(producto);
+                    productoService.updateProducto(productoDTO);
 
-                    logger.info("Producto(s) agregado(s) al carrito: " + producto);
+                    logger.info("Producto(s) agregado(s) al carrito: " + ProductoDTO);
                 } else {
                     throw new CarritoException("No hay suficiente stock");
                 }
@@ -125,16 +122,12 @@ public class CarritoService {
     @Transactional
     public void eliminarProducto(Long carritoId, Long productoId) {
         try {
-            logger.info("Iniciando eliminarProducto...");
-
             Carrito carrito = obtenerCarritoPorId(carritoId);
-            logger.info("Carrito obtenido: " + carrito);
 
-            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(productoId);
-            logger.info("Optional<Producto> obtenido: " + optionalProducto);
+            Optional<Producto> optionalProductoDTO = productoService.obtenerProductoPorId(productoId);
 
-            if (optionalProducto.isPresent()) {
-                Producto producto = optionalProducto.get();
+            if (optionalProductoDTO.isPresent()) {
+                productoDTO = optionalProductoDTO.get();
 
                 boolean productoEnCarrito = false;
 
@@ -154,7 +147,7 @@ public class CarritoService {
 
                     // Guarda los cambios en el carrito y actualiza el producto.
                     carritoRepository.save(carrito);
-                    productoService.actualizarProducto(producto);
+                    productoService.updateProducto(producto);
 
                     logger.info("Producto eliminado del carrito: " + producto);
                 } else {

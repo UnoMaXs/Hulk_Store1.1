@@ -1,6 +1,7 @@
 package com.example.hulkstore.DTO;
 
 import com.example.hulkstore.Entity.Carrito;
+import com.example.hulkstore.Entity.Producto;
 import lombok.Data;
 
 @Data

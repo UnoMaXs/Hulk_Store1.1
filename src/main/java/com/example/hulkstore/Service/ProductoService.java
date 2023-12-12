@@ -57,6 +57,7 @@ public class ProductoService {
                 Producto producto = optionalProducto.get();
                 return Optional.of(modelMapper.map(producto, ProductoDTO.class));
             } else {
+                logger.info("Producto no encontrado");
                 return Optional.empty();
             }
         } catch (Exception e) {
@@ -90,8 +91,6 @@ public class ProductoService {
             throw new ProductoException("Ocurrió un error al borrar el producto");
         }
     }
-
-
 
 }
 

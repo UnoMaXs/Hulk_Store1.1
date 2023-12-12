@@ -11,6 +11,6 @@ public class CarritoDTO {
     private Long carritoId;
     private int cantidadProductos;
     private Double valorTotal;
-    private List<Producto> Productos;
+    private List<ProductoDTO> Productos;
     private Usuario usuario;
 }

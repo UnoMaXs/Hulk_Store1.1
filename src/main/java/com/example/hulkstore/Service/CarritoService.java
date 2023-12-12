@@ -1,10 +1,12 @@
 package com.example.hulkstore.Service;
 
+import com.example.hulkstore.DTO.CarritoDTO;
 import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Exceptions.CarritoException;
 import com.example.hulkstore.Repository.CarritoRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,30 +25,39 @@ public class CarritoService {
     private CarritoRepository carritoRepository;
     @Autowired
     private ProductoService productoService;
+    @Autowired
+    private ModelMapper modelMapper;
+    private CarritoDTO carritoDTO;
+    private ProductoDTO productoDTO;
 
-    public List<Carrito> verCarritos() {
+    public List<CarritoDTO> getCarritos() {
         try {
-            return carritoRepository.findAll();
+            List<Carrito> carritos = carritoRepository.findAll();
+            List<CarritoDTO> carritoDTO = new ArrayList<>();
+            for (Carrito carrito : carritos) {
+                carritoDTO.add(modelMapper.map(carrito, CarritoDTO.class));
+            }
+            return carritoDTO;
         } catch (Exception e) {
             logger.info("Ocurrió un error al obtener la lista de carritos: " + e.getMessage());
-            return new ArrayList<>();
+            throw new CarritoException("Ocurrió un error al obtener la lista de productos");
         }
     }
 
-    public List<Carrito> verCarritoId(Long carritoId) {
+    public Optional<CarritoDTO> getCarritoById(Long carritoId) {
         try {
             Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
             if (optionalCarrito.isPresent()) {
-                List<Carrito> listaCarrito = new ArrayList<>();
-                listaCarrito.add(optionalCarrito.get());
-                return listaCarrito;
+//                List<Carrito> listaCarrito = new ArrayList<>();
+                Carrito carrito = optionalCarrito.get();
+                return Optional.of(modelMapper.map(carrito, CarritoDTO.class));
             } else {
                 logger.info("Carrito no encontrado");
-                return new ArrayList<>();
+                return Optional.empty();
             }
         } catch (Exception e) {
             logger.info("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
-            return new ArrayList<>();
+            throw new CarritoException("Ocurrió un error al obtener el carrito");
         }
     }
 
@@ -63,11 +74,12 @@ public class CarritoService {
     public void calcularTotal(Carrito carrito) {
         try {
             double valorTotal = 0.0;
-            for (Producto producto : carrito.getProductos()) {
-                valorTotal += producto.getPrecio();
+            List<ProductoDTO> productosDTO = carritoDTO.getProductos();
+            for (ProductoDTO productoDTO : productosDTO) {
+                valorTotal += productoDTO.getPrecio();
             }
-            carrito.setCantidadProductos(carrito.getProductos().size());
-            carrito.setValorTotal(valorTotal);
+            carritoDTO.setCantidadProductos(carritoDTO.getProductos().size());
+            carritoDTO.setValorTotal(valorTotal);
         } catch (Exception e) {
             logger.info("Ocurrió un error al calcular el total del carrito: " + e.getMessage());
         }
@@ -81,31 +93,33 @@ public class CarritoService {
             Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
 
             if (optionalProductoDTO.isPresent()) {
-                ProductoDTO productoDTO = optionalProductoDTO.get();
+                productoDTO = optionalProductoDTO.get();
 
                 if (productoDTO.getCantidad() > 0) {
                     boolean existeEnCarrito = false;
 
-                    for (Producto p : carrito.getProductos()) {
-                        if (p.getProductoId().equals(productoId)) {
-                            p.setCantidad(p.getCantidad() + 1);
+                    for (Producto producto : carrito.getProductos()) {
+                        if (producto.getProductoId().equals(productoId)) {
+                            producto.setCantidad(producto.getCantidad() + 1);
                             existeEnCarrito = true;
                             break;
                         }
                     }
 
                     if (!existeEnCarrito) {
+                        Producto producto = modelMapper.map(productoDTO, Producto.class);
                         productoDTO.setCantidad(1);
-                        carrito.getProductos().add(ProductoDTO);
+                        carrito.getProductos().add(producto);
                     }
 
-                    productoDTO.setCantidad(ProductoDTO.getCantidad() - 1);
+                    productoDTO.setCantidad(productoDTO.getCantidad() + 1);
                     calcularTotal(carrito);
 
                     carritoRepository.save(carrito);
-                    productoService.updateProducto(productoDTO);
+                    Producto producto = modelMapper.map(productoDTO, Producto.class);
+                    productoService.updateProducto(producto);
 
-                    logger.info("Producto(s) agregado(s) al carrito: " + ProductoDTO);
+                    logger.info("Producto(s) agregado(s) al carrito: " + productoDTO);
                 } else {
                     throw new CarritoException("No hay suficiente stock");
                 }
@@ -124,7 +138,7 @@ public class CarritoService {
         try {
             Carrito carrito = obtenerCarritoPorId(carritoId);
 
-            Optional<Producto> optionalProductoDTO = productoService.obtenerProductoPorId(productoId);
+            Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
 
             if (optionalProductoDTO.isPresent()) {
                 productoDTO = optionalProductoDTO.get();
@@ -141,12 +155,11 @@ public class CarritoService {
                 }
 
                 if (productoEnCarrito) {
-                    // Incrementa la cantidad en el inventario y recalcula el valor total del carrito.
-                    producto.setCantidad(producto.getCantidad() + 1);
+                    productoDTO.setCantidad(productoDTO.getCantidad() + 1);
                     calcularTotal(carrito);
 
-                    // Guarda los cambios en el carrito y actualiza el producto.
                     carritoRepository.save(carrito);
+                    Producto producto = modelMapper.map(productoDTO, Producto.class);
                     productoService.updateProducto(producto);
 
                     logger.info("Producto eliminado del carrito: " + producto);
@@ -157,7 +170,6 @@ public class CarritoService {
                 throw new CarritoException("Producto no encontrado");
             }
         } catch (Exception e) {
-            // Maneja otras excepciones de manera adecuada.
             logger.info("Ocurrió un error al eliminar el producto del carrito: " + e.getMessage());
             throw new CarritoException("Ocurrió un error al eliminar el producto del carrito");
         }

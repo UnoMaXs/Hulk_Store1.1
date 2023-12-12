@@ -29,7 +29,7 @@ public class ProductoService {
         try {
             productoRepository.save(producto);
             productoDTO = modelMapper.map(producto, ProductoDTO.class);
-            logger.info("Producto agregado correctamente");
+            logger.info("Producto agregado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al agregar el producto: " + e.getMessage());
             throw new ProductoException("Ocurrió un error al agregar el producto");
@@ -57,7 +57,7 @@ public class ProductoService {
                 Producto producto = optionalProducto.get();
                 return Optional.of(modelMapper.map(producto, ProductoDTO.class));
             } else {
-                logger.info("Producto no encontrado");
+                logger.info("Producto no encontrado en el servicio");
                 return Optional.empty();
             }
         } catch (Exception e) {
@@ -70,7 +70,7 @@ public class ProductoService {
         try {
             productoRepository.save(producto);
             productoDTO = modelMapper.map(producto, ProductoDTO.class);
-            logger.info("Producto actualizado correctamente");
+            logger.info("Producto actualizado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al actualizar el producto: " + e.getMessage());
             throw new ProductoException("Ocurrió un error al actualizar el producto");
@@ -83,8 +83,9 @@ public class ProductoService {
             if (optionalProducto.isPresent()) {
                 productoRepository.deleteById(productoId);
                 productoDTO = modelMapper.map(optionalProducto, ProductoDTO.class);
+                logger.info("Producto eliminado correctamente en el servicio");
             } else {
-                logger.info("No se encuentra el producto");
+                logger.info("No se encuentra el producto en el servicio");
             }
         } catch (Exception e) {
             logger.info("Ocurrió un error al borrar el producto: " + e.getMessage());

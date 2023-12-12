@@ -36,7 +36,7 @@ public class ProductoController {
         try {
             Optional<ProductoDTO> productoOptional = productoService.getProductoById(productoId);
             return ResponseEntity.ok(productoOptional.get());
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(null);
         }
@@ -47,7 +47,7 @@ public class ProductoController {
         try {
             productoService.addProducto(producto);
             return ResponseEntity.ok("Producto agregado correctamente");
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al agregar producto");
         }
@@ -56,10 +56,16 @@ public class ProductoController {
     @PutMapping("/updateProducto/{productoId}") // Actualizar producto
     public ResponseEntity<String> updateProducto(@PathVariable("productoId") Long productoId, @RequestBody Producto producto) {
         try {
-            producto.setProductoId(productoId);
-            productoService.updateProducto(producto);
-            return ResponseEntity.ok("Producto actualizado correctamente");
-        }catch (Exception e) {
+            Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
+            if (optionalProductoDTO.isPresent()) {
+                producto.setProductoId(productoId);
+                productoService.updateProducto(producto);
+                return ResponseEntity.ok("Producto actualizado correctamente");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Producto con la id " + productoId + " no encontrado");
+            }
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al actualizar el producto");
         }
@@ -68,8 +74,14 @@ public class ProductoController {
     @DeleteMapping("/deleteProducto/{productoId}") // Borrar producto
     public ResponseEntity<String> deleteProducto(@PathVariable Long productoId) {
         try {
-            productoService.deleteProductoById(productoId);
-            return ResponseEntity.ok("Usuario eliminado correctamente");
+            Optional<ProductoDTO> optionalProductoDTO = productoService.getProductoById(productoId);
+            if (optionalProductoDTO.isPresent()) {
+                productoService.deleteProductoById(productoId);
+                return ResponseEntity.ok("producto eliminado correctamente");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Producto con la id " + productoId + " no encontrado");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al eliminar producto");

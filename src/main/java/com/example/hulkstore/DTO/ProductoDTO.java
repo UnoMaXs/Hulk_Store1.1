@@ -10,5 +10,5 @@ public class ProductoDTO {
     private String nombre;
     private int cantidad;
     private Long precio;
-    private Carrito carrito;
+//    private Carrito carrito;
 }

@@ -22,6 +22,7 @@ public class ProductoService {
     private ProductoRepository productoRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
     private ProductoDTO productoDTO;
 
 
@@ -62,7 +63,7 @@ public class ProductoService {
             logger.info("Producto agregado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al agregar el producto: " + e.getMessage());
-            throw new ProductoException("Ocurrió un error al agregar el producto");
+            throw new ProductoException("Ocurrió un error al agregar el producto" + e.getMessage());
         }
     }
 
@@ -73,7 +74,7 @@ public class ProductoService {
             logger.info("Producto actualizado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al actualizar el producto: " + e.getMessage());
-            throw new ProductoException("Ocurrió un error al actualizar el producto");
+            throw new ProductoException("Ocurrió un error al actualizar el producto" + e.getMessage());
         }
     }
 
@@ -92,6 +93,10 @@ public class ProductoService {
             throw new ProductoException("Ocurrió un error al borrar el producto");
         }
     }
+
+
+
+
 
 }
 

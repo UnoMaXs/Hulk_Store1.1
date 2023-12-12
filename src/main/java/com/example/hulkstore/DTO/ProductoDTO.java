@@ -1,9 +1,9 @@
 package com.example.hulkstore.DTO;
 
-import com.example.hulkstore.Entity.Carrito;
-import com.example.hulkstore.Entity.Producto;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
+@Component
 @Data
 public class ProductoDTO {
     private Long productoId;

@@ -20,7 +20,7 @@ public class Carrito {
 
     private Double valorTotal=0.0;
 
-    @OneToMany(mappedBy = "carrito")
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Producto> productos = new ArrayList<>();
 

@@ -57,7 +57,7 @@ public class AdminService {
         try {
             adminRepository.save(admin);
             adminDTO = modelMapper.map(admin, AdminDTO.class);
-            logger.info("Administrador agregado correctamente");
+            logger.info("Administrador agregado correctamente desde servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al agregar el admin: " + e.getMessage());
         }
@@ -67,7 +67,7 @@ public class AdminService {
         try {
             adminRepository.save(admin);
             adminDTO = modelMapper.map(admin, AdminDTO.class);
-            logger.info("Administrador actualizado correctamente");
+            logger.info("Administrador actualizado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al actualizar el admin: " + e.getMessage());
         }
@@ -80,7 +80,9 @@ public class AdminService {
                 adminRepository.deleteById(AdminId);
 
                 adminDTO = modelMapper.map(optionalAdmin, AdminDTO.class);
-                logger.info("Administrador eliminado correctamente");
+                logger.info("Administrador eliminado correctamente en el servicio");
+            } else {
+                logger.info("No existe administrador con esa id"+AdminId);
             }
         } catch (Exception e) {
             logger.info("Ocurrió un error al eliminar el admin por ID: " + e.getMessage());

@@ -4,6 +4,7 @@ import com.example.hulkstore.DTO.UsuarioDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Repository.UsuarioRepository;
+import com.example.hulkstore.Util.PasswordEncryptionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private PasswordEncryptionService passwordEncryptionService;
+    @Autowired
     private UsuarioDTO usuarioDTO;
 
     public List<UsuarioDTO> getUsuarios() {
@@ -55,6 +59,7 @@ public class UsuarioService {
 
     public void addUsuario(Usuario usuario) {
         try {
+            usuario.setContrasenaCifrada(passwordEncryptionService.cifrarContrasena(usuario.getContrasena()));
             Carrito carrito = new Carrito();
             carrito.setUsuario(usuario);
             usuario.setCarrito(carrito);

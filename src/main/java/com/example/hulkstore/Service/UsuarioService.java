@@ -4,7 +4,6 @@ import com.example.hulkstore.DTO.UsuarioDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Repository.UsuarioRepository;
-import com.example.hulkstore.Util.PasswordEncryptionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,10 +22,6 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ModelMapper modelMapper;
-    @Autowired
-    private PasswordEncryptionService passwordEncryptionService;
-    @Autowired
-    private UsuarioDTO usuarioDTO;
 
     public List<UsuarioDTO> getUsuarios() {
         try {
@@ -59,12 +54,11 @@ public class UsuarioService {
 
     public void addUsuario(Usuario usuario) {
         try {
-            usuario.setContrasenaCifrada(passwordEncryptionService.cifrarContrasena(usuario.getContrasena()));
             Carrito carrito = new Carrito();
             carrito.setUsuario(usuario);
             usuario.setCarrito(carrito);
             usuarioRepository.save(usuario);
-            usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
+            UsuarioDTO usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
             logger.info("Usuario agregado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al agregar el usuario: " + e.getMessage());
@@ -74,7 +68,7 @@ public class UsuarioService {
     public void updateUsuario(Usuario usuario) {
         try {
             usuarioRepository.save(usuario);
-            usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
+            UsuarioDTO usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
             logger.info("Usuario actualizado correctamente en el servicio");
         } catch (Exception e) {
             logger.info("Ocurrió un error al actualizar el usuario: " + e.getMessage());
@@ -86,7 +80,7 @@ public class UsuarioService {
             Optional<Usuario> optionalUsuario = usuarioRepository.findById(UsuarioId);
             if (optionalUsuario.isPresent()){
                 usuarioRepository.deleteById(UsuarioId);
-                usuarioDTO = modelMapper.map(optionalUsuario, UsuarioDTO.class);
+                UsuarioDTO usuarioDTO = modelMapper.map(optionalUsuario, UsuarioDTO.class);
                 logger.info("Usuario eliminado correctamente en el servicio");
             }
         } catch (Exception e) {

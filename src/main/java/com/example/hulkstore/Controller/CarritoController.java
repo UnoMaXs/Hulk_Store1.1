@@ -2,6 +2,7 @@ package com.example.hulkstore.Controller;
 
 import com.example.hulkstore.DTO.CarritoDTO;
 import com.example.hulkstore.DTO.ProductoDTO;
+import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Exceptions.CarritoException;
 import com.example.hulkstore.Service.CarritoService;
 import com.example.hulkstore.Service.ProductoService;
@@ -53,68 +54,13 @@ public class CarritoController {
         }
     }
 
-    @PostMapping("/agregarProducto/{carritoId}/{productoId}")
-    public ResponseEntity<String> agregarProductoAlCarrito(@PathVariable("carritoId") Long carritoId,
-                                                           @PathVariable("productoId") Long productoId) {
-        try {
-            Optional<CarritoDTO> optionalCarrito = carritoService.getCarritoById(carritoId);
-            if (optionalCarrito.isPresent()) {
-                Optional<ProductoDTO> optinalProducto = productoService.getProductoById(productoId);
-                if (optinalProducto.isPresent()) {
-                    carritoService.agregarProductoAlCarrito(carritoId, productoId);
-                    return ResponseEntity.ok("Producto agregado al carrito exitosamente");
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("Producto con la id " + productoId + " no encontrado");
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Carrito con la id " + carritoId + " no encontrado");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al agregar el producto al carrito: " + e.getMessage());
-        }
-    }
+//    @PostMapping("/agregarProducto/{carritoId}")
+//    public void agregarProductoAlCarrito(@PathVariable Long carritoId, @RequestBody ProductoDTO productoDTO) {
+//        Producto producto = new Producto();
+//        producto.setProductoId(productoDTO.getProductoId());
+//        producto.setCantidad(productoDTO.getCantidad());
+//        carritoService.agregarProductoAlCarrito(carritoId, producto);
+//    }
 
-    @PutMapping("/eliminarProducto/{carritoId}/{productoId}")
-    public ResponseEntity<String> eliminarProductoDeCarrito(@PathVariable("carritoId") Long carritoId,
-                                                            @PathVariable("productoId") Long productoId) {
-        try {
-            Optional<CarritoDTO> optionalCarrito = carritoService.getCarritoById(carritoId);
-            if (optionalCarrito.isPresent()) {
-                Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
-                if (optionalProducto.isPresent()) {
-                    carritoService.eliminarProductoDelCarrito(carritoId, productoId);
-                    return ResponseEntity.ok("Producto eliminado del carrito exitosamente");
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("Producto con la id " + productoId + " no encontrado");
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Producto con la id " + productoId + " no encontrado");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al eliminar el producto de carrito " + e.getMessage());
-        }
-    }
 
-    @GetMapping("/verProductos/{carritoId}")
-    public String verProductosDelCarrito(@PathVariable Long carritoId, Model model) {
-        try {
-            // Llama al método en CarritoService para obtener la lista de productos del carrito
-            List<ProductoDTO> productosDTO = carritoService.listaDeProductos(carritoId);
-
-            // Agrega la lista de productos al modelo para pasarla a la vista
-            model.addAttribute("productos", productosDTO);
-
-            // Puedes devolver el nombre de la vista que mostrará la lista de productos
-            return productosDTO.toString();
-        } catch (CarritoException e) {
-            // Manejar excepciones
-            model.addAttribute("error", "Error al obtener la lista de productos del carrito.");
-            return "error"; // Puedes tener una vista específica para errores
-        }
-    }}
+}

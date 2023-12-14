@@ -1,15 +1,11 @@
 package com.example.hulkstore.Controller;
 
 import com.example.hulkstore.DTO.CarritoDTO;
-import com.example.hulkstore.DTO.ProductoDTO;
-import com.example.hulkstore.Entity.Producto;
-import com.example.hulkstore.Exceptions.CarritoException;
+
 import com.example.hulkstore.Service.CarritoService;
-import com.example.hulkstore.Service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -22,8 +18,6 @@ public class CarritoController {
 
     @Autowired
     private CarritoService carritoService;
-    @Autowired
-    private ProductoService productoService;
 
     @GetMapping("/verCarritos")
     public ResponseEntity<List<CarritoDTO>> verCarritos() {
@@ -53,14 +47,5 @@ public class CarritoController {
                     .body(null);
         }
     }
-
-//    @PostMapping("/agregarProducto/{carritoId}")
-//    public void agregarProductoAlCarrito(@PathVariable Long carritoId, @RequestBody ProductoDTO productoDTO) {
-//        Producto producto = new Producto();
-//        producto.setProductoId(productoDTO.getProductoId());
-//        producto.setCantidad(productoDTO.getCantidad());
-//        carritoService.agregarProductoAlCarrito(carritoId, producto);
-//    }
-
 
 }

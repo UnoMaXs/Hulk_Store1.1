@@ -1,7 +1,9 @@
 package com.example.hulkstore.Service;
 
 import com.example.hulkstore.DTO.CarritoDTO;
+import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.Entity.Carrito;
+import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Exceptions.CarritoException;
 import com.example.hulkstore.Repository.CarritoRepository;
 import org.modelmapper.ModelMapper;
@@ -20,6 +22,8 @@ public class CarritoService {
 
     @Autowired
     private CarritoRepository carritoRepository;
+    @Autowired
+    private ProductoService productoService;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -53,48 +57,5 @@ public class CarritoService {
             throw new CarritoException("Ocurrió un error al obtener el carrito");
         }
     }
-
-
-//    @Transactional
-//    public void agregarProductoAlCarrito(Long carritoId, Producto producto) {
-//        try {
-//            Optional<CarritoDTO> optionalCarritoDTO = getCarritoById(carritoId);
-//            if (optionalCarritoDTO.isPresent()) {
-//                CarritoDTO carritoDTO = optionalCarritoDTO.get();
-//                Carrito carrito = modelMapper.map(carritoDTO, Carrito.class);
-//
-//                producto.setCarrito(carrito);
-//                carrito.getProductos().add(producto);
-//
-//                carrito.setCantidadProductos(carrito.getCantidadProductos() + 1);
-//                carrito.setValorTotal(calcularTotal((CarritoDTO) carrito.getProductos()));
-//
-//                carritoRepository.save(carrito);
-//            }
-//        } catch (Exception e) {
-//            logger.info("Error al agregar producto al carrito");
-//            throw new CarritoException(e.getMessage());
-//        }
-//    }
-
-
-    //UTIL
-//    public double calcularTotal(CarritoDTO carritoDTO) {
-//        try {
-//            double valorTotal = 0.0;
-//            ProductoDTO productosDTO = (ProductoDTO) carritoDTO.getProductos();
-//            for (ProductoDTO productoDTO : productosDTO) {
-//                valorTotal += productoDTO.getPrecio();
-//            }
-//            carritoDTO.setCantidadProductos(productosDTO.size());
-//            carritoDTO.setValorTotal(valorTotal);
-//            return valorTotal;
-//        } catch (Exception e) {
-//            logger.info("Ocurrió un error al calcular el total del carrito: " + e.getMessage());
-//            return 0.0;
-//        }
-//    }
-
-
 
 }

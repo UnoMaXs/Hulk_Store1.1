@@ -1,16 +1,20 @@
 package com.example.hulkstore.Controller;
 
+import com.example.hulkstore.DTO.CarritoDTO;
+import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.DTO.UsuarioDTO;
 import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 
 @RestController
@@ -20,80 +24,30 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @GetMapping("/verUsuarios")
-    public ResponseEntity<List<UsuarioDTO>> getUsuarios() {
-        try {
-            List<UsuarioDTO> usuarioDTO = usuarioService.getUsuarios();
-            return ResponseEntity.ok(usuarioDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.emptyList());
-        }
-    }
-
-    @GetMapping("/verUsuario/{usuarioId}")//Listar usuarios
-    public ResponseEntity<Object> getUsuariosById(@PathVariable("usuarioId") Long usuarioId) {
-        try {
-            Optional<UsuarioDTO> optionalUsuario = usuarioService.getUsuarioById(usuarioId);
-            if (optionalUsuario.isPresent()) {
-                Optional<UsuarioDTO> usuarioOptional = usuarioService.getUsuarioById(usuarioId);
-                return ResponseEntity.ok(usuarioOptional.get());
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("No existe usuario con la id: " + usuarioId);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
-    }
-
     @PostMapping("/addUsuario")
-    public ResponseEntity<String> saveUsuario(@RequestBody Usuario usuario) {
-        try {
-            usuarioService.addUsuario(usuario);
-            return ResponseEntity.ok("Admin añadido correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al agregar Administrador");
-        }
+    public void saveUsuario(@RequestBody Usuario usuario) {
+        usuarioService.addUsuario(usuario);
+    }
 
+    @GetMapping("/verUsuarios")
+    public List<UsuarioDTO> getUsuarios() {
+        return usuarioService.getUsuarios();
+    }
+
+    @GetMapping("/usuario/{usuarioId}")//Listar usuarios
+    public Optional<Usuario> getUsuariosById(@PathVariable("usuarioId") Long usuarioId) {
+        return usuarioService.getUsuariosById(usuarioId);
     }
 
     @PutMapping("/updateUsuario/{usuarioId}")//Actualizar usuario
-    public ResponseEntity<String> updateUsuario(@PathVariable("usuarioId") Long usuarioId, @RequestBody Usuario usuario) {
-        try {
-            Optional<UsuarioDTO> optionalUsuario = usuarioService.getUsuarioById(usuarioId);
-            if (optionalUsuario.isPresent()) {
-                usuario.setUsuarioId(usuarioId);
-                usuarioService.updateUsuario(usuario);
-                return ResponseEntity.ok("Usuario actualizado correctamente");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("No existe usuario con la id: " + usuarioId);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al actualizar el usuario");
-        }
+    public void updateUsuario(@PathVariable("usuarioId") Long usuarioId, @RequestBody Usuario usuario) {
+        usuario.setUsuarioId(usuarioId);
+        usuarioService.updateUsuario(usuario);
     }
 
     @DeleteMapping("/deleteUsuario/{usuarioId}")//Borrar usuario
-    public ResponseEntity<String> deleteUsuarioById(@PathVariable("usuarioId") Long usuarioId) {
-        try {
-            Optional<UsuarioDTO> optionalUsuario = usuarioService.getUsuarioById(usuarioId);
-            if (optionalUsuario.isPresent()) {
-                usuarioService.deleteUsuarioById(usuarioId);
-                return ResponseEntity.ok("Usuario eliminado correctamente");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("No existe usuario con la id: " + usuarioId);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al eliminar usuario");
-        }
+    public void deleteUsuarioById(@PathVariable("usuarioId") Long usuarioId) {
+        usuarioService.deleteUsuarioById(usuarioId);
     }
 
 }

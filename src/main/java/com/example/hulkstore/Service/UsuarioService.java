@@ -1,91 +1,115 @@
 package com.example.hulkstore.Service;
 
+import com.example.hulkstore.DTO.CarritoDTO;
+import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.DTO.UsuarioDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Repository.UsuarioRepository;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @Service
 public class UsuarioService {
 
-    Logger logger = Logger.getLogger(getClass().getName());
-
     @Autowired
     private UsuarioRepository usuarioRepository;
+
     @Autowired
-    private ModelMapper modelMapper;
-
-    public List<UsuarioDTO> getUsuarios() {
-        try {
-            List<Usuario> usuarios = usuarioRepository.findAll();
-            List<UsuarioDTO>usuarioDTO = new ArrayList<>();
-            for (Usuario usuario : usuarios){
-                usuarioDTO.add(modelMapper.map(usuario, UsuarioDTO.class));
-            }
-            return usuarioDTO;
-        } catch (Exception e) {
-            logger.info("Ocurrió un error al obtener la lista de usuarios: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public Optional<UsuarioDTO> getUsuarioById(Long usuarioId) {
-        try {
-            Optional<Usuario> optionalUsuario = usuarioRepository.findById(usuarioId);
-            if (optionalUsuario.isPresent()) {
-                Usuario usuario = optionalUsuario.get();
-                return Optional.of(modelMapper.map(usuario, UsuarioDTO.class));
-            } else {
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            logger.info("Ocurrió un error al obtener el usuario por ID: " + e.getMessage());
-            return Optional.empty();
-        }
-    }
-
+    private JdbcTemplate jdbcTemplate;
     public void addUsuario(Usuario usuario) {
         try {
             Carrito carrito = new Carrito();
             carrito.setUsuario(usuario);
-            usuario.setCarrito(carrito);
             usuarioRepository.save(usuario);
-            UsuarioDTO usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
-            logger.info("Usuario agregado correctamente en el servicio");
         } catch (Exception e) {
-            logger.info("Ocurrió un error al agregar el usuario: " + e.getMessage());
+            System.err.println("Ocurrió un error al agregar el usuario: " + e.getMessage());
+        }
+    }
+
+    public List<UsuarioDTO> getUsuarios() {
+        List<UsuarioDTO> usuario = jdbcTemplate.query("SELECT u.usuario_id, u.nombre, u.correo, u.contrasena, " +
+                        "SUM(c.cantidad_productos) as total_productos, SUM(c.valor_total) as total_valor, c.carrito_id " +
+                        "FROM usuarios u " +
+                        "LEFT JOIN carritos c ON u.usuario_id = c.usuario_id " +
+                        "GROUP BY u.usuario_id",
+                (rs, rowNum) -> {
+                    Long usuarioId = rs.getLong("usuario_id");
+
+                    UsuarioDTO usuarioDto = new UsuarioDTO();
+                    usuarioDto.setUsuarioId(usuarioId);
+                    usuarioDto.setNombre(rs.getString("nombre"));
+                    usuarioDto.setCorreo(rs.getString("correo"));
+                    usuarioDto.setContrasena(rs.getString("contrasena"));
+
+                    CarritoDTO carrito = new CarritoDTO();
+                    carrito.setCarritoId(rs.getLong("carrito_id"));
+                    carrito.setCantidadProductos(rs.getInt("total_productos"));
+                    carrito.setValorTotal(rs.getDouble("total_valor"));
+                    carrito.setUsuario(usuarioDto);
+
+                    // Asegúrate de que la lista de carritos en el usuario esté inicializada
+                    usuarioDto.setCarrito(new ArrayList<>());
+                    usuarioDto.getCarrito().add(carrito);
+
+                    // Consulta para obtener los productos asociados a este carrito
+                    List<ProductoDTO> productos = jdbcTemplate.query("SELECT p.producto_id, p.nombre, p.precio, p.cantidad " +
+                                    "FROM producto p " +
+                                    "LEFT JOIN carrito_producto cp ON p.producto_id = cp.producto_id " +
+                                    "WHERE cp.carrito_id = ?",
+                            (rs2, rowNum2) -> {
+                                ProductoDTO producto = new ProductoDTO();
+                                producto.setProductoId(rs2.getLong("producto_id"));
+                                producto.setNombre(rs2.getString("nombre"));
+                                producto.setPrecio(rs2.getLong("precio"));
+                                producto.setCantidad(rs2.getInt("cantidad"));
+                                return producto;
+                            }, carrito.getCarritoId());
+
+                    // Asegúrate de que la lista de productos en el carrito esté inicializada
+                    carrito.setProductos(new ArrayList<>());
+                    carrito.getProductos().addAll(productos);
+
+                    return usuarioDto;
+                });
+        try {
+            return usuario;
+        } catch (Exception e) {
+            System.err.println("Ocurrió un error al obtener la lista de usuarios: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Optional<Usuario> getUsuariosById(Long usuarioId) {
+        try {
+            return usuarioRepository.findById(usuarioId);
+        } catch (Exception e) {
+            System.err.println("Ocurrió un error al obtener el usuario por ID: " + e.getMessage());
+            return Optional.empty();
         }
     }
 
     public void updateUsuario(Usuario usuario) {
         try {
             usuarioRepository.save(usuario);
-            UsuarioDTO usuarioDTO = modelMapper.map(usuario, UsuarioDTO.class);
-            logger.info("Usuario actualizado correctamente en el servicio");
         } catch (Exception e) {
-            logger.info("Ocurrió un error al actualizar el usuario: " + e.getMessage());
+            System.err.println("Ocurrió un error al actualizar el usuario: " + e.getMessage());
         }
     }
 
-    public void deleteUsuarioById(Long UsuarioId) {
+    public void deleteUsuarioById(Long id) {
         try {
-            Optional<Usuario> optionalUsuario = usuarioRepository.findById(UsuarioId);
-            if (optionalUsuario.isPresent()){
-                usuarioRepository.deleteById(UsuarioId);
-                UsuarioDTO usuarioDTO = modelMapper.map(optionalUsuario, UsuarioDTO.class);
-                logger.info("Usuario eliminado correctamente en el servicio");
-            }
+            usuarioRepository.deleteById(id);
         } catch (Exception e) {
-            logger.info("Ocurrió un error al eliminar el usuario por ID: " + e.getMessage());
+            System.err.println("Ocurrió un error al eliminar el usuario por ID: " + e.getMessage());
         }
-
     }
+
 }
+

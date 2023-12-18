@@ -1,61 +1,118 @@
 package com.example.hulkstore.Service;
 
-import com.example.hulkstore.DTO.CarritoDTO;
-import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.Entity.Carrito;
-import com.example.hulkstore.Entity.Producto;
 import com.example.hulkstore.Exceptions.CarritoException;
 import com.example.hulkstore.Repository.CarritoRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @Service
 public class CarritoService {
 
-    Logger logger = Logger.getLogger(getClass().getName());
-
     @Autowired
     private CarritoRepository carritoRepository;
-    @Autowired
-    private ProductoService productoService;
-    @Autowired
-    private ModelMapper modelMapper;
 
-
-    public List<CarritoDTO> getCarritos() {
+    public List<Carrito> verCarritos() {
         try {
-            List<Carrito> carritos = carritoRepository.findAll();
-            List<CarritoDTO> carritoDTO = new ArrayList<>();
-            for (Carrito carrito : carritos) {
-                carritoDTO.add(modelMapper.map(carrito, CarritoDTO.class));
-            }
-            return carritoDTO;
+            return carritoRepository.findAll();
         } catch (Exception e) {
-            logger.info("Ocurrió un error al obtener la lista de carritos: " + e.getMessage());
-            throw new CarritoException("Ocurrió un error al obtener la lista de carritos");
+            System.err.println("Ocurrió un error al obtener la lista de carritos: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 
-    public Optional<CarritoDTO> getCarritoById(Long carritoId) {
+    public List<Carrito> verCarritoId(Long carritoId) {
         try {
             Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
             if (optionalCarrito.isPresent()) {
-                Carrito carrito = optionalCarrito.get();
-                return Optional.of(modelMapper.map(carrito, CarritoDTO.class));
+                List<Carrito> listaCarrito = new ArrayList<>();
+                listaCarrito.add(optionalCarrito.get());
+                return listaCarrito;
             } else {
-                logger.info("Carrito no encontrado en servicio");
-                return Optional.empty();
+                System.out.println("Carrito no encontrado");
+                return new ArrayList<>();
             }
         } catch (Exception e) {
-            logger.info("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
-            throw new CarritoException("Ocurrió un error al obtener el carrito");
+            System.err.println("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 
+    public Carrito obtenerCarritoPorId(Long carritoId) {
+        try {
+            Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
+            return optionalCarrito.orElse(null);
+        } catch (Exception e) {
+            System.err.println("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
+            throw new CarritoException("Ocurrió un error al obtener el carrito por ID");
+        }
+    }
+    @Transactional
+    public void agregarProducto(Carrito carritoDto) {
+        try {
+            System.out.println("carritoDto: " + carritoDto);
+            // Valida que el carrito no esté vacío.
+            if (carritoDto == null) {
+                throw new CarritoException("El carrito no puede estar vacío");
+            }
+            //Crear carrito
+            carritoRepository.save(carritoDto);
+            System.out.println("Carrito creado: " + carritoDto);
+
+            // Mostramos el mensaje de éxito.
+            System.out.println("Producto agregado al carrito exitosamente");
+
+        } catch (Exception e) {
+            // Maneja otras excepciones de manera adecuada.
+            System.err.println("Ocurrió un error al agregar el producto al carrito: " + e.getMessage());
+            throw new CarritoException("Ocurrió un error al agregar el producto al carrito");
+        }
+    }
+
+    // Actualizar producto en el carrito
+    @Transactional
+    public void actualizarProducto(Long carritoId, Carrito carritoDto) {
+        try {
+            // Validamos que el id exista.
+            if (carritoId == null) {
+                throw new CarritoException("El id del carrito no puede ser nulo");
+            }
+            // Obtenemos el carrito por id.
+            Carrito carrito = obtenerCarritoPorId(carritoId);
+            carrito.setUsuario(carritoDto.getUsuario());
+            carrito.setProductos(carritoDto.getProductos());
+            carritoRepository.save(carrito);
+            // Mostramos el mensaje de éxito.
+            System.out.println("Producto actualizado en el carrito exitosamente");
+        } catch (Exception e) {
+            // Maneja otras excepciones de manera adecuada.
+            System.err.println("Ocurrió un error al actualizar el producto en el carrito: " + e.getMessage());
+            throw new CarritoException("Ocurrió un error al actualizar el producto en el carrito");
+        }
+    }
+
+    @Transactional
+    public void eliminarProducto(Long carritoId) {
+        try {
+            // Validamos que el id exista.
+            if (carritoId == null) {
+                throw new CarritoException("El id del carrito no puede ser nulo");
+            }
+            // Obtenemos el carrito por id.
+            Carrito carrito = obtenerCarritoPorId(carritoId);
+            // Eliminamos el carrito.
+            carritoRepository.delete(carrito);
+            // Mostramos el mensaje de éxito.
+            System.out.println("Producto eliminado del carrito exitosamente");
+        } catch (Exception e) {
+            // Maneja otras excepciones de manera adecuada.
+            System.err.println("Ocurrió un error al eliminar el producto del carrito: " + e.getMessage());
+            throw new CarritoException("Ocurrió un error al eliminar el producto del carrito");
+        }
+    }
 }

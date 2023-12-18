@@ -1,16 +1,18 @@
 package com.example.hulkstore.DTO;
 
-import lombok.Data;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 
-@Component
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import lombok.Data;
+
 @Data
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "carritoId")
 public class CarritoDTO {
     private Long carritoId;
     private int cantidadProductos;
     private Double valorTotal;
-    private List<ProductoDTO> Productos;
+    private UsuarioDTO usuario;
+    private List<ProductoDTO> productos;
 }
-

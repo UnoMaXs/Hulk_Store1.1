@@ -1,15 +1,16 @@
 package com.example.hulkstore.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.Data;
-
-import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import jakarta.persistence.*;
+import lombok.Data;
 @Entity
 @Table(name="carritos")
 @Data
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "carritoId")
 public class Carrito {
 
     @Id
@@ -20,13 +21,13 @@ public class Carrito {
 
     private Double valorTotal=0.0;
 
-    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Producto> productos = new ArrayList<>();
-
-    @OneToOne
-    @JoinColumn(name = "usuario_id")
-    @JsonIgnore
+    @ManyToOne
+    @jakarta.persistence.JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+    @ManyToMany
+    @JoinTable(name = "carrito_producto",
+            joinColumns = @JoinColumn(name = "carrito_id"),
+            inverseJoinColumns = @JoinColumn(name = "producto_id"))
+    private List<Producto> productos;
 }

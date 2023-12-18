@@ -21,9 +21,4 @@ public class Producto {
     private int cantidad;
     @NotNull
     private Long precio;
-
-    @ManyToOne
-    @JoinColumn(name="carrito_id")
-    @JsonIgnore
-    private Carrito carrito;
 }

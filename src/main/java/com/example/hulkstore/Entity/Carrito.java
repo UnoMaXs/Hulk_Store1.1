@@ -10,15 +10,12 @@ import lombok.Data;
 @Entity
 @Table(name="carritos")
 @Data
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "carritoId")
 public class Carrito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carritoId;
-
     private int cantidadProductos=0;
-
     private Double valorTotal=0.0;
 
     @ManyToOne

@@ -1,8 +1,10 @@
 package com.example.hulkstore.Service;
 
+import com.example.hulkstore.DTO.CarritoDTO;
 import com.example.hulkstore.Entity.Carrito;
 import com.example.hulkstore.Exceptions.CarritoException;
 import com.example.hulkstore.Repository.CarritoRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,14 +12,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class CarritoService {
 
+    Logger logger = Logger.getLogger(getClass().getName());
+
     @Autowired
     private CarritoRepository carritoRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
-    public List<Carrito> verCarritos() {
+    public List<Carrito> getCarritos() {
         try {
             return carritoRepository.findAll();
         } catch (Exception e) {
@@ -26,20 +33,19 @@ public class CarritoService {
         }
     }
 
-    public List<Carrito> verCarritoId(Long carritoId) {
+    public Optional<CarritoDTO> getCarritoById(Long carritoId) {
         try {
             Optional<Carrito> optionalCarrito = carritoRepository.findById(carritoId);
+
             if (optionalCarrito.isPresent()) {
-                List<Carrito> listaCarrito = new ArrayList<>();
-                listaCarrito.add(optionalCarrito.get());
-                return listaCarrito;
+                Carrito carrito = optionalCarrito.get();
+                return Optional.of(modelMapper.map(carrito, CarritoDTO.class));
             } else {
-                System.out.println("Carrito no encontrado");
-                return new ArrayList<>();
+                return Optional.empty();
             }
         } catch (Exception e) {
-            System.err.println("Ocurrió un error al obtener el carrito por ID: " + e.getMessage());
-            return new ArrayList<>();
+            logger.info("Ocurrio un error al obtener el carrito por ID: "+e.getMessage());
+            throw new CarritoException("Ocurrio un error al obtener el admin");
         }
     }
 

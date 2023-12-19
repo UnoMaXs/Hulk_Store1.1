@@ -34,11 +34,8 @@ public class UsuarioService {
     }
 
     public List<UsuarioDTO> getUsuarios() {
-        List<UsuarioDTO> usuario = jdbcTemplate.query("SELECT u.usuario_id, u.nombre, u.correo, u.contrasena, " +
-                        "SUM(c.cantidad_productos) as total_productos, SUM(c.valor_total) as total_valor, c.carrito_id " +
-                        "FROM usuarios u " +
-                        "LEFT JOIN carritos c ON u.usuario_id = c.usuario_id " +
-                        "GROUP BY u.usuario_id",
+        try {
+            return jdbcTemplate.query(usuarioRepository.sqlAllUser,
                 (rs, rowNum) -> {
                     Long usuarioId = rs.getLong("usuario_id");
 
@@ -59,10 +56,7 @@ public class UsuarioService {
                     usuarioDto.getCarrito().add(carrito);
 
                     // Consulta para obtener los productos asociados a este carrito
-                    List<ProductoDTO> productos = jdbcTemplate.query("SELECT p.producto_id, p.nombre, p.precio, p.cantidad " +
-                                    "FROM producto p " +
-                                    "LEFT JOIN carrito_producto cp ON p.producto_id = cp.producto_id " +
-                                    "WHERE cp.carrito_id = ?",
+                    List<ProductoDTO> productos = jdbcTemplate.query(usuarioRepository.sqlProductUser,
                             (rs2, rowNum2) -> {
                                 ProductoDTO producto = new ProductoDTO();
                                 producto.setProductoId(rs2.getLong("producto_id"));
@@ -78,8 +72,6 @@ public class UsuarioService {
 
                     return usuarioDto;
                 });
-        try {
-            return usuario;
         } catch (Exception e) {
             System.err.println("Ocurrió un error al obtener la lista de usuarios: " + e.getMessage());
             return null;

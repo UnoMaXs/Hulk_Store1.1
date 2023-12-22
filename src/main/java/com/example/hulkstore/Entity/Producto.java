@@ -21,4 +21,6 @@ public class Producto {
     private int cantidad;
     @NotNull
     private Long precio;
+    @Column(name = "imagen", columnDefinition = "LONGTEXT", nullable = false)
+    private String imagen;
 }

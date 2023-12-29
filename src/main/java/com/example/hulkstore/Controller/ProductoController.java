@@ -50,10 +50,10 @@ public class ProductoController {
     }
 
     @PostMapping("/addProducto") // Agregar producto
-    public ResponseEntity<String> addProducto(@RequestBody Producto producto) {
+    public ResponseEntity<?> addProducto(@RequestBody Producto producto) {
         try {
             productoService.addProducto(producto);
-            return ResponseEntity.ok("Producto agregado correctamente");
+            return ResponseEntity.ok(Collections.singletonList("Producto agregado correctamente"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al agregar producto");
@@ -61,13 +61,13 @@ public class ProductoController {
     }
 
     @PutMapping("/updateProducto/{productoId}") // Actualizar producto
-    public ResponseEntity<String> updateProducto(@PathVariable("productoId") Long productoId, @RequestBody Producto producto) {
+    public ResponseEntity<?> updateProducto(@PathVariable("productoId") Long productoId, @RequestBody Producto producto) {
         try {
             Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
             if (optionalProducto.isPresent()) {
                 producto.setProductoId(productoId);
                 productoService.updateProducto(producto);
-                return ResponseEntity.ok("Producto actualizado correctamente");
+                return ResponseEntity.ok(Collections.singletonList("Producto actualizado correctamente"));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("Producto con la id " + productoId + " no encontrado");
@@ -79,12 +79,12 @@ public class ProductoController {
     }
 
     @DeleteMapping("/deleteProducto/{productoId}") // Borrar producto
-    public ResponseEntity<String> deleteProducto(@PathVariable Long productoId) {
+    public ResponseEntity<?> deleteProducto(@PathVariable Long productoId) {
         try {
             Optional<ProductoDTO> optionalProducto = productoService.getProductoById(productoId);
             if (optionalProducto.isPresent()) {
                 productoService.deleteProductoById(productoId);
-                return ResponseEntity.ok("producto eliminado correctamente");
+                return ResponseEntity.ok(Collections.singletonList("Producto eliminado correctamente"));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("Producto con la id " + productoId + " no encontrado");

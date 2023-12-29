@@ -2,8 +2,10 @@ package com.example.hulkstore.Service;
 
 import com.example.hulkstore.DTO.CarritoDTO;
 import com.example.hulkstore.DTO.ProductoDTO;
+import com.example.hulkstore.DTO.RolDto;
 import com.example.hulkstore.DTO.UsuarioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Repository.UsuarioRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,7 @@ public class UsuarioService {
         try {
             Carrito carrito = new Carrito();
             carrito.setUsuario(usuario);
+            System.out.println("Usuario: " + usuario);
             usuarioRepository.save(usuario);
         } catch (Exception e) {
             System.err.println("Ocurrió un error al agregar el usuario: " + e.getMessage());
@@ -44,6 +48,20 @@ public class UsuarioService {
                     usuarioDto.setNombre(rs.getString("nombre"));
                     usuarioDto.setCorreo(rs.getString("correo"));
                     usuarioDto.setContrasena(rs.getString("contrasena"));
+                    usuarioDto.setIdRol(jdbcTemplate.queryForObject(
+                            "SELECT r.rol_id, r.descripcion " +
+                                    "FROM roles r " +
+                                    "LEFT JOIN usuarios u ON r.rol_id = u.id_rol " +
+                                    "WHERE u.usuario_id = ?",
+                            (rs1, rowNum1) -> {
+                                RolDto rol = new RolDto();
+                                rol.setRolId(rs1.getLong("rol_id"));
+                                rol.setDescripcion(rs1.getString("descripcion"));
+                                return rol;
+                            },
+                            usuarioId
+                    ));
+
 
                     CarritoDTO carrito = new CarritoDTO();
                     carrito.setCarritoId(rs.getLong("carrito_id"));
@@ -87,11 +105,22 @@ public class UsuarioService {
         }
     }
 
-    public void updateUsuario(Usuario usuario) {
+    public ResponseEntity<?> updateUsuario(Long usuarioId, Usuario UsuarioDetalles) {
         try {
-            usuarioRepository.save(usuario);
+            com.example.hulkstore.Entity.Usuario usuarioUpdate = usuarioRepository.findById(usuarioId).orElse(null);
+            if (usuarioUpdate != null) {
+                usuarioUpdate.setNombre(UsuarioDetalles.getNombre());
+                usuarioUpdate.setCorreo(UsuarioDetalles.getCorreo());
+                usuarioUpdate.setContrasena(UsuarioDetalles.getContrasena());
+                usuarioUpdate.setIdRol(UsuarioDetalles.getIdRol());
+                usuarioRepository.save(usuarioUpdate);
+                return ResponseEntity.status(201).body(Collections.singletonList("Usuario actualizado correctamente"));
+            } else {
+                return ResponseEntity.status(404).body(Collections.singletonList("Usuario con la id " + usuarioId + " no encontrado"));
+            }
         } catch (Exception e) {
             System.err.println("Ocurrió un error al actualizar el usuario: " + e.getMessage());
+            return ResponseEntity.status(500).build();
         }
     }
 

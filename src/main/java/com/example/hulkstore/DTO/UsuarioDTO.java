@@ -17,4 +17,5 @@ public class UsuarioDTO {
     private String correo;
     private String contrasena;
     private List<CarritoDTO> carrito;
+    private RolDto idRol;
 }

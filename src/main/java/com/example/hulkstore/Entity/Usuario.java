@@ -28,4 +28,7 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private List<Carrito> carrito;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "id_rol", nullable = false)
+    private Rol idRol;
 }

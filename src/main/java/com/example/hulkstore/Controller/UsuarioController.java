@@ -1,17 +1,11 @@
 package com.example.hulkstore.Controller;
 
-import com.example.hulkstore.DTO.CarritoDTO;
-import com.example.hulkstore.DTO.ProductoDTO;
 import com.example.hulkstore.DTO.UsuarioDTO;
 import com.example.hulkstore.Entity.Usuario;
 import com.example.hulkstore.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,9 +35,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/updateUsuario/{usuarioId}")//Actualizar usuario
-    public void updateUsuario(@PathVariable("usuarioId") Long usuarioId, @RequestBody Usuario usuario) {
-        usuario.setUsuarioId(usuarioId);
-        usuarioService.updateUsuario(usuario);
+    public org.springframework.http.ResponseEntity<?> updateUsuario(@PathVariable Long usuarioId, @RequestBody Usuario usuario) {
+        return usuarioService.updateUsuario(usuarioId, usuario);
     }
 
     @DeleteMapping("/deleteUsuario/{usuarioId}")//Borrar usuario
